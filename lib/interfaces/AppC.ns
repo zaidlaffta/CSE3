@@ -3,7 +3,9 @@ configuration AppC {
 }  
   
 implementation {  
-    ActiveMessageC, Flood, NeighborDiscovery;    
+    
+    ActiveMessageC, Flood, NeighborDiscovery;   
+
     AppC.Packet -> ActiveMessageC;  
       
     // Wiring for the Flood protocol  
