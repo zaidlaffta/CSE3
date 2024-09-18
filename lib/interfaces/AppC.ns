@@ -3,7 +3,7 @@ configuration AppC {
 }  
   
 implementation {  
-    components MainC, ActiveMessageC, Flood, NeighborDiscovery;  
+    ActiveMessageC, Flood, NeighborDiscovery;  
   
     MainC.Boot -> AppC;  
     AppC.Packet -> ActiveMessageC;  

@@ -10,7 +10,7 @@ module NeighborDiscoveryC {
     message_t packet;  
   
     event void Boot.booted() {  
-        call NeighborTimer.startPeriodic(2000); // Start a periodic timer  
+        call NeighborTimer.startPeriodic(1000); // Start a periodic timer  
     }  
   
     event void NeighborTimer.fired() {  
