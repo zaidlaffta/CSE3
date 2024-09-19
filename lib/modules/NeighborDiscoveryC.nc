@@ -12,7 +12,7 @@ module NeighborDiscoveryC {
     event void Boot.booted() {  
         call NeighborTimer.startPeriodic(1000); // Start a periodic timer  
     }  
-  
+
     event void NeighborTimer.fired() {  
         // Code to send a neighbor discovery message periodically  
         uint8_t* payload = call Packet.getPayload(&packet, sizeof(uint8_t));  

@@ -56,9 +56,7 @@ implementation{
          return msg;
       }
       /// added to handle the discovery message for testing 
-      else if(myMsg->dest == 0) {
-            call NeighborDiscovery.handleNeighbor(myMsg);
-        }
+      
       dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       return msg;
    }
