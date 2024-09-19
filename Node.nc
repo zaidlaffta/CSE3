@@ -17,8 +17,7 @@ module Node{
    uses interface Boot;
    uses interface SplitControl as AMControl;
    uses interface Receive;
-   uses interface Flooding;
-   uses interface NeighborDiscovery as NeighborDiscovery;
+  
 
    uses interface SimpleSend as Sender;
 
