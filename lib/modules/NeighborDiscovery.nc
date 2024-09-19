@@ -7,11 +7,11 @@ configuration NeighborDiscovery {
 }
 
 implementation {
-    components NeighborDiscoveryC, ActiveMessageC, TimerMilliC;  // Declare all components
+    components NeighborDiscoveryC, ActiveMessageC, new TimerMilliC() as NeighborTimerC;
 
     // Wiring interfaces
     NeighborDiscoveryC.Packet -> ActiveMessageC.Packet;
-    NeighborDiscoveryC.AMSend -> ActiveMessageC.AMSend[AM_BROADCAST_ADDR];
-    NeighborDiscoveryC.Receive -> ActiveMessageC.Receive[AM_BROADCAST_ADDR];
-    NeighborDiscoveryC.NeighborTimer -> TimerMilliC;
+    NeighborDiscoveryC.AMSend -> ActiveMessageC.AMSend[TOS_BCAST_ADDR];  // Use TOS_BCAST_ADDR for broadcasting
+    NeighborDiscoveryC.Receive -> ActiveMessageC.Receive[TOS_BCAST_ADDR];
+    NeighborDiscoveryC.NeighborTimer -> NeighborTimerC;
 }
