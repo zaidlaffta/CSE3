@@ -1,5 +1,8 @@
+//CSE160
+//Project 1
 #include "../../includes/CommandMsg.h"
-#include "../../includes/packet.h"
+#include "../../includes/command.h"
+#include "../../includes/channels.h"
 
 configuration FloodingC {
 	// The FloodingC configuration provides the Flooding interface to other modules.

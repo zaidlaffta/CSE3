@@ -18,7 +18,7 @@ implementation {
     components RandomC as Random;
     NeighborDiscoveryP.Random -> Random;
     
-    // TimerMilliC is a timer that fires periodically
+    // TimerMilliC is a timer that fires periodically which was giving in the lab lecture
     components new TimerMilliC() as Timer;
     NeighborDiscoveryP.Timer -> Timer;
 
