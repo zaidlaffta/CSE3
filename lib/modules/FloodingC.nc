@@ -4,7 +4,7 @@
 configuration FloodingC{
   provides interface SimpleSend as LSPSender;
   provides interface SimpleSend as FloodSender;
-    provides interface SimpleSend as RouteSender;
+  provides interface SimpleSend as RouteSender;
   uses interface List<lspLink> as lspLinkC;
   uses interface Hashmap<int> as HashmapC;
   /*provides interface Receive as MainReceive;
@@ -16,7 +16,7 @@ implementation{
   components new SimpleSendC(AM_FLOODING);
   components new AMReceiverC(AM_FLOODING);
 
-  // Wire Internal Components
+  // Wire Internal Components All togather 
   FloodingP.InternalSender -> SimpleSendC;
   FloodingP.InternalReceiver -> AMReceiverC;
   FloodingP.lspLinkList = lspLinkC;
