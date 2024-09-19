@@ -15,9 +15,10 @@
 
 module Node{
    uses interface Boot;
-
    uses interface SplitControl as AMControl;
    uses interface Receive;
+   uses interface Flooding;
+   uses interface NeighborDiscovery as NeighborDiscovery;
 
    uses interface SimpleSend as Sender;
 
@@ -54,6 +55,10 @@ implementation{
          dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
          return msg;
       }
+      /// added to handle the discovery message for testing 
+      else if(myMsg->dest == 0) {
+            call NeighborDiscovery.handleNeighbor(myMsg);
+        }
       dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       return msg;
    }
