@@ -1,33 +1,26 @@
-// Configuration
-#define AM_NEIGHBOR 62
+#include <Timer.h>
+#include "../../includes/CommandMsg.h"
+#include "../../includes/packet.h"
 
-configuration NeighborDiscoveryC{
-  provides interface NeighborDiscovery;
-  uses interface List<pack> as neighborListC;
+configuration NeighborDiscoveryC {
+	provides interface NeighborDiscovery;
 }
+implementation {
 
-implementation{
-  components NeighborDiscoveryP;
-  //components new TimerMilliC() as neigbordiscoveryTimer;
-  components new SimpleSendC(AM_NEIGHBOR);
-  components new AMReceiverC(AM_NEIGHBOR);
+	components NeighborDiscoveryP;
+	NeighborDiscovery = NeighborDiscoveryP;
 
-  NeighborDiscoveryP.neighborList = neighborListC;
+	components RandomC as Random;
+    NeighborDiscoveryP.Random -> Random;
+    
+    components new TimerMilliC() as Timer;
+    NeighborDiscoveryP.Timer -> Timer;
 
-  components RandomC as Random;
-  NeighborDiscoveryP.Random -> Random;
+    components new SimpleSendC(AM_PACK);
+    NeighborDiscoveryP.Sender -> SimpleSendC;
 
-  // External Wiring
-  NeighborDiscovery = NeighborDiscoveryP.NeighborDiscovery;
+    components new HashmapC(uint32_t, 20);
+    NeighborDiscoveryP.NeighborTable -> HashmapC;
 
-  components new TimerMilliC() as myTimerC; //create a new timer with alias “myTimerC”
-  NeighborDiscoveryP.neigbordiscoveryTimer -> myTimerC; //Wire the interface to the component
-
-  components FloodingC;
-  NeighborDiscoveryP.FloodSender -> FloodingC.FloodSender;
-
-  // internal Wiring
-  //NeighborDiscoveryP.SimpleSend -> SimpleSendC;
-  //NeighborDiscoveryP.Receve -> AMReceive;
-  //NeighborDiscoveryP.beaconTimer -> beaconTimer;
+  
 }

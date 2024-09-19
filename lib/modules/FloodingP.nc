@@ -165,8 +165,8 @@ implementation{
         return msg;
       }
 
-      //Project 1 - Custom Methods
-      //Searches for a packet in our seen/sent packet list
+      
+      
       bool findMyPacket(pack *Package)
       {
         uint16_t size = call packetList.size();
