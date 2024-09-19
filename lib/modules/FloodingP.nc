@@ -11,7 +11,6 @@ module FloodingP{
   provides interface SimpleSend as FloodSender;
   provides interface SimpleSend as LSPSender;
   provides interface SimpleSend as RouteSender;
-
 // Use interfaces 
   uses interface SimpleSend as InternalSender;
   uses interface Receive as InternalReceiver;
@@ -40,7 +39,16 @@ implementation{
     msg.TTL = MAX_TTL;
     call InternalSender.send(msg, AM_BROADCAST_ADDR);
   }
-
+// Make packet code from the lab in Friday. 
+   void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length){
+         Package->src = src;
+         Package->dest = dest;
+         Package->TTL = TTL;
+         Package->seq = seq;
+         Package->protocol = protocol;
+         memcpy(Package->payload, payload, length);
+      }
+    // Need to implement timer as shown in the lab lecture 
   command error_t LSPSender.send(pack msg, uint16_t dest)
   {
     call InternalSender.send(msg, AM_BROADCAST_ADDR);
@@ -69,11 +77,6 @@ implementation{
             dbg(FLOODING_CHANNEL, "Going to ping");
             return msg;
           }     
-            if(myMsg->protocol == PROTOCOL_PING)
-            {
-              makePack(&sendPackage, TOS_NODE_ID, AM_BROADCAST_ADDR, myMsg->TTL-1 , PROTOCOL_PINGREPLY, seqNumber, myMsg->payload, PACKET_MAX_PAYLOAD_SIZE);
-              call InternalSender.send(sendPackage, myMsg->src);
-            }
             if(myMsg->protocol == PROTOCOL_PINGREPLY)
               call NeighborDiscovery.neighborReceived(myMsg);
             return msg;
@@ -91,14 +94,7 @@ implementation{
 //
 // need to find mypacket impelentation 
 //   
-// Make packet code from the lab in Friday. 
-      void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length){
-         Package->src = src;
-         Package->dest = dest;
-         Package->TTL = TTL;
-         Package->seq = seq;
-         Package->protocol = protocol;
-         memcpy(Package->payload, payload, length);
-      }
+
+     
   }
 }
