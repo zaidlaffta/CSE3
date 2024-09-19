@@ -34,7 +34,6 @@ implementation{
     msg.protocol = PROTOCOL_PING;
     msg.seq = seqNumber++;
     msg.TTL = MAX_TTL;
-    //dbg(FLOODING_CHANNEL, "Flooding Network: %s\n", msg.payload);
     call InternalSender.send(msg, AM_BROADCAST_ADDR);
   }
 
@@ -47,72 +46,44 @@ implementation{
     call InternalSender.send(msg, dest);
   }
 
-
+// need to finish receiver 
   event message_t* InternalReceiver.receive(message_t* msg, void* payload, uint8_t len){
-    //dbg(FLOODING_CHANNEL, "Receive: %s", msg.payload);
     if(len==sizeof(pack)){
       pack* myMsg=(pack*) payload;
       if(myMsg->TTL == 0 || findMyPacket(myMsg))
       {
-        //Drop the packet if we've seen it or if it's TTL has run out: i.e. do nothing
         return  msg;
         }else if(TOS_NODE_ID == myMsg->dest)
         { //Destination found
           dbg(FLOODING_CHANNEL, "This is the Destination from : %d to %d\n",myMsg->src,myMsg->dest);
           dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
-          //Ping Back to the Source
           if(myMsg->protocol == PROTOCOL_PING)
           {
             dbg(GENERAL_CHANNEL, "PING-REPLY EVENT \n");
             dbg(FLOODING_CHANNEL, "Going to ping from: %d to %d with seq %d\n", myMsg->dest,myMsg->src,myMsg->seq);
             return msg;
-
-            }
-            else if(myMsg->protocol == PROTOCOL_PINGREPLY)
-            {
-              dbg(FLOODING_CHANNEL, "Received a Ping Reply from %d\n", myMsg->src);
-            }
-
+          }
             return msg;
         
             if(myMsg->protocol == PROTOCOL_PING)
             {
-              //dbg(GENERAL_CHANNEL,"Starting Neighbor Discover for %d\n",myMsg->src);
               makePack(&sendPackage, TOS_NODE_ID, AM_BROADCAST_ADDR, myMsg->TTL-1 , PROTOCOL_PINGREPLY, seqNumber, myMsg->payload, PACKET_MAX_PAYLOAD_SIZE);
-              //Check TOS_NODE_ID and destination
               call InternalSender.send(sendPackage, myMsg->src);
-
             }
-
             if(myMsg->protocol == PROTOCOL_PINGREPLY)
-            {
-              //dbg(GENERAL_CHANNEL,"AT Neighbor PingReply\n");
               call NeighborDiscovery.neighborReceived(myMsg);
-            }
-            //call lsrTimer.startPeriodic(60000 + (uint16_t)((call Random.rand16())%200));
             return msg;
-          }
-          else
-          {
             checkPackets(myMsg);
             if(call routingTable.contains(myMsg -> src)){
               dbg(NEIGHBOR_CHANNEL, "to get to:%d, send through:%d\n", myMsg -> dest, call routingTable.get(myMsg -> dest));
               makePack(&sendPackage, myMsg->src, myMsg->dest, myMsg->TTL-1, myMsg->protocol, myMsg->seq, (uint8_t *) myMsg->payload, sizeof(myMsg->payload));
               call InternalSender.send(sendPackage, call routingTable.get(myMsg -> dest));
             }
-            else{
-              dbg(NEIGHBOR_CHANNEL, "Couldn't find the routing table for:%d so flooding\n",TOS_NODE_ID);
-              makePack(&sendPackage, myMsg->src, myMsg->dest, myMsg->TTL-1, myMsg->protocol, myMsg->seq, (uint8_t *) myMsg->payload, sizeof(myMsg->payload));
-              call InternalSender.send(sendPackage, AM_BROADCAST_ADDR);
-            }
             return msg;
           }
 
-        }
-        dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
-        return msg;
-      }
-
+        
+// Need to implement pack beaconup
       
       
       bool findMyPacket(pack *Package)
@@ -128,16 +99,7 @@ implementation{
         }
         return FALSE;
       }
-
-      void checkPackets(pack *myMsg){
-              if(call packetList.isFull())
-              { //check for List size. If it has reached the limit. #popfront
-                call packetList.popfront();
-              }
-              //Pushing Packet to PacketList
-              call packetList.pushback(*myMsg);
-            }
-
+// Make packet code from the lab in Friday. 
       void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length){
          Package->src = src;
          Package->dest = dest;

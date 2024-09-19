@@ -14,11 +14,11 @@ implementation {
     components NeighborDiscoveryP;
     NeighborDiscovery = NeighborDiscoveryP;
 
-    // The RandomC component is used for generating random numbers, likely to randomize
+    // The RandomC component is used for generating random numbers,
     components RandomC as Random;
     NeighborDiscoveryP.Random -> Random;
     
-    // TimerMilliC is a timer that fires periodically, which is probably used to trigger
+    // TimerMilliC is a timer that fires periodically
     components new TimerMilliC() as Timer;
     NeighborDiscoveryP.Timer -> Timer;
 
