@@ -39,7 +39,6 @@ implementation{
   }
 
   command error_t LSPSender.send(pack msg, uint16_t dest){
-//    dbg(ROUTING_CHANNEL, "LSP Network: %s\n", msg.payload);
     call InternalSender.send(msg, AM_BROADCAST_ADDR);
   }
 
@@ -51,13 +50,11 @@ implementation{
 
   event message_t* InternalReceiver.receive(message_t* msg, void* payload, uint8_t len){
     //dbg(FLOODING_CHANNEL, "Receive: %s", msg.payload);
-    // Check to see if we have seen it before?
     if(len==sizeof(pack)){
       pack* myMsg=(pack*) payload;
       if(myMsg->TTL == 0 || findMyPacket(myMsg))
       {
         //Drop the packet if we've seen it or if it's TTL has run out: i.e. do nothing
-        //dbg(FLOODING_CHANNEL, "Packet Exists in the List so dropping packet with seq %d from %d\n", myMsg->seq, TOS_NODE_ID);
         return  msg;
         }else if(TOS_NODE_ID == myMsg->dest)
         { //Destination found
@@ -68,18 +65,6 @@ implementation{
           {
             dbg(GENERAL_CHANNEL, "PING-REPLY EVENT \n");
             dbg(FLOODING_CHANNEL, "Going to ping from: %d to %d with seq %d\n", myMsg->dest,myMsg->src,myMsg->seq);
-
-            checkPackets(myMsg);
-            if(call routingTable.contains(myMsg -> src)){
-              dbg(NEIGHBOR_CHANNEL, "to get to:%d, send through:%d\n", myMsg -> src, call routingTable.get(myMsg -> src));
-              makePack(&sendPackage, myMsg->dest, myMsg->src, MAX_TTL, PROTOCOL_PINGREPLY, myMsg->seq, (uint8_t *) myMsg->payload, sizeof(myMsg->payload));
-              call InternalSender.send(sendPackage, call routingTable.get(myMsg -> src));
-            }
-            else{
-              dbg(NEIGHBOR_CHANNEL, "Couldn't find the routing table for:%d so flooding\n",TOS_NODE_ID);
-              makePack(&sendPackage, myMsg->dest, myMsg->src, myMsg->TTL-1, PROTOCOL_PINGREPLY, myMsg->seq, (uint8_t *) myMsg->payload, sizeof(myMsg->payload));
-              call InternalSender.send(sendPackage, AM_BROADCAST_ADDR);
-            }
             return msg;
 
             }
@@ -89,44 +74,7 @@ implementation{
             }
 
             return msg;
-          }else if(myMsg->dest == AM_BROADCAST_ADDR)
-          {
-            if(myMsg->protocol == PROTOCOL_LINKSTATE)
-            {
-              uint16_t i,j = 0;
-              uint16_t k = 0;
-              bool enterdata = TRUE;
-              for(i = 0; i < myMsg->seq; i++)
-              {
-                for(j = 0; j < call lspLinkList.size(); j++)
-                {
-                  lspLink lspacket = call lspLinkList.get(j);
-                  if(lspacket.src == myMsg->src && lspacket.neighbor==myMsg->payload[i])
-                  {
-                    enterdata = FALSE;
-                  }
-                }
-              }
-
-              if(enterdata)
-              {
-                for(k = 0; k < myMsg->seq; k++)
-                {
-                  lspL.neighbor = myMsg->payload[k];
-                  lspL.cost = 1;
-                  lspL.src = myMsg->src;
-                  call lspLinkList.pushback(lspL);
-                  //dbg(ROUTING_CHANNEL,"$$$Neighbor: %d\n",lspL.neighbor);
-                }
-                makePack(&sendPackage, myMsg->src, AM_BROADCAST_ADDR, myMsg->TTL-1 , PROTOCOL_LINKSTATE, myMsg->seq, myMsg->payload, PACKET_MAX_PAYLOAD_SIZE);
-                //Check TOS_NODE_ID and destination
-                call InternalSender.send(sendPackage,AM_BROADCAST_ADDR);
-              }
-              else{
-                //dbg(ROUTING_CHANNEL,"LSP already exists for %d\n",TOS_NODE_ID);
-              }
-            }
-           //Handle neighbor discovery packets here
+        
             if(myMsg->protocol == PROTOCOL_PING)
             {
               //dbg(GENERAL_CHANNEL,"Starting Neighbor Discover for %d\n",myMsg->src);

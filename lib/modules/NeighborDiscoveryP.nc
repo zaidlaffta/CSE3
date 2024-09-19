@@ -48,16 +48,9 @@ implementation {
     }
 
     event void Timer.fired() {
-        //dbg(NEIGHBOR_CHANNEL, "In Timer fired\n");
-        //dbg(GENERAL_CHANNEL, "In timer fired\n");
-
         uint32_t* neighbors = call NeighborTable.getKeys();
         uint8_t payload = 0;
-
-        // Prune inactive neighbors
         uint16_t i = 0;
-        //dbg(NEIGHBOR_CHANNEL, "In Timer fired\n");
-
         for(i = i; i<call NeighborTable.size(); i++) {
             if(neighbors[i]==0) {continue;}
             if (call NeighborTable.get(neighbors[i]) == 0) {
