@@ -42,13 +42,13 @@ implementation {
         }
 
     void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
-        //dbg(NEIGHBOR_CHANNEL, "In Timer fired 3\n");
         Package->src = src; Package->dest = dest;
         Package->TTL = TTL; Package->seq = seq;
         Package->protocol = protocol;  
         memcpy(Package->payload, payload, length);
     } 
    // use debug statement to print neighbors
+   //still missing some code here. 
 }
 
 
