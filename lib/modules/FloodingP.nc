@@ -1,17 +1,15 @@
 //CSE160
 //Project 1
 
-
-// Module
 #include "../../includes/channels.h"
 #include "../../includes/lsp.h"
 #include "../../includes/CommandMsg.h"
-
+//This is the module
 module FloodingP{
   provides interface SimpleSend as FloodSender;
   provides interface SimpleSend as LSPSender;
   provides interface SimpleSend as RouteSender;
-// Use interfaces 
+// Use interfaces as part of module
   uses interface SimpleSend as InternalSender;
   uses interface Receive as InternalReceiver;
   uses interface List<pack> as packetList;
@@ -27,11 +25,7 @@ implementation{
   bool findMyPacket(pack *Package);
   void checkPackets(pack *myMsg);
   void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
-
-
-  lspLink lspL;
-  uint16_t lspAge = 0;
-
+//error command
   command error_t FloodSender.send(pack msg, uint16_t dest){
     msg.src = TOS_NODE_ID;
     msg.protocol = PROTOCOL_PING;
