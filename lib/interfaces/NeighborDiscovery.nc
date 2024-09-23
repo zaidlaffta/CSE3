@@ -1,13 +1,13 @@
 
 //CSE160
 //Project 1
+#include "../../includes/packet.h"
 interface NeighborDiscovery {
-	// Starts the neighbor discovery process. This could involve broadcasting
-	command void start();
+	
+	command error_t start();
+   	command void discover(pack* packet);
+   	command void printNeighbors();
+   	command uint32_t* getNeighbors();
+   	command uint16_t getNeighborListSize();
 
-	// Outputs information about the current state of the neighbor discovery process.
-	command void print();
-
-	// Handles an incoming message from a neighboring node. 
-	command void neighborReceived(pack *myMsg);
 }
