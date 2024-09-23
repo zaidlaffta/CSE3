@@ -61,19 +61,17 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
       	 // Don't print messages from neighbor probe packets or DV packets or 
       	 if( strcmp( (char*)(myMsg->payload), "NeighborProbing") && (myMsg->protocol) != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY) {
       		dbg(GENERAL_CHANNEL, "Packet Received\n");
-      	 	//dbg(GENERAL_CHANNEL, "%d\n", myMsg -> protocol);
+      	 	dbg(GENERAL_CHANNEL, "%d\n", myMsg -> protocol);
             dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
       	 }
-         if(myMsg->protocol == PROTOCOL_DV) {
-         	//dbg(GENERAL_CHANNEL, "Distance Vector Protocol\n");
-         }
+         
          else if (myMsg->dest == 0) {
-            //dbg(GENERAL_CHANNEL, "Neighbor Discovery called\n");
+            dbg(GENERAL_CHANNEL, "Neighbor Discovery called here \n");
       		call NeighborDiscovery.discover(myMsg);
       	 }
           
           else {
-            //dbg(GENERAL_CHANNEL, "Got Here\n");
+            dbg(GENERAL_CHANNEL, "Flooding function called here\n");
             call Flooding.Flood(myMsg);
           }
          return msg;
