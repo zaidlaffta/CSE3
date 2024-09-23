@@ -82,10 +82,11 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
           }
          return msg;
       }
-      // print these only when packet not recognized
-      dbg(GENERAL_CHANNEL, "Packet Received\n");
-      dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
+      // debug statement if the packet received is not correct or currpted. 
+      dbg(GENERAL_CHANNEL, "The packet received is currpted!!!! \n")
+      //Print out the total number of times Neighbor discovery called 
       dbg(GENERAL_CHANNEL, "Total Neighbor Discovery %d \n", Neighbor_protocol);
+      //print out the total number of times Flooding was called
       dbg(GENERAL_CHANNEL, "Total Flooding %d \n", FLOODING_Protocol);
       return msg;
    }
@@ -95,6 +96,7 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
 
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
    dbg(GENERAL_CHANNEL, "PING EVENT\n");
+   dbg(GENERAL_CHANNEL, "Ping Hundler******************************************************** \n")
    makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
    call Sender.send(sendPackage, destination);
 
