@@ -58,7 +58,7 @@ implementation{
 event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
       if(len==sizeof(pack)){
       	 pack* myMsg = (pack*) payload;
-      	 // Don't print messages from neighbor probe packets or DV packets or TCP packets
+      	 // Don't print messages from neighbor probe packets or DV packets or 
       	 if( strcmp( (char*)(myMsg->payload), "NeighborProbing") && (myMsg->protocol) != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY) {
       		dbg(GENERAL_CHANNEL, "Packet Received\n");
       	 	//dbg(GENERAL_CHANNEL, "%d\n", myMsg -> protocol);
