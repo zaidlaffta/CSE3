@@ -49,7 +49,14 @@ implementation{
       }
    }
 
-   event void AMControl.stopDone(error_t err){}
+   event void AMControl.stopDone(error_t err){
+      if(err != SUCCESS){
+         dbg(GENERAL_CHANNEL, "Radio is not working \n")
+      }else{
+         //retray again!
+         call AMControl.start();
+      }
+   }
 
 // Int to count number of times neighbor discovery executed 
 int Neighbor_protocol = 0;
