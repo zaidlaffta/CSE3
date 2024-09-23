@@ -83,14 +83,8 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
          return msg;
       }
       // debug statement if the packet received is not correct or currpted. 
-      //dbg(GENERAL_CHANNEL, "The packet received is currpted!!!! \n")
-      //Print out the total number of times Neighbor discovery called 
-      //dbg(GENERAL_CHANNEL, "Total Neighbor Discovery %d \n", Neighbor_protocol);
-      //print out the total number of times Flooding was called
-      //dbg(GENERAL_CHANNEL, "Total Flooding %d \n", FLOODING_Protocol);
-      //return msg;
       dbg(GENERAL_CHANNEL, "Packet Received\n");
-      dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
+      dbg(GENERAL_CHANNEL, "This is currpted packet \n");
       return msg;
    }
 /////////////////////////////////////////////
