@@ -54,30 +54,42 @@ implementation{
 
    event void AMControl.stopDone(error_t err){}
 
- event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
-   dbg(GENERAL_CHANNEL, "Packet Received\n");
-//   pack* myMsg = (pack*) payload;  // Declaring myMsg outside of the if 
-   
-   if(len == sizeof(pack)){
-     // dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
-   }
-   else if (myMsg->dest == 0) {
-      call NeighborDiscovery.discover(myMsg);
-      dbg(GENERAL_CHANNEL, "Neighbor Discovery being called in here\n");
-
-   }
-   else if (myMsg->protocol == PROTOCOL_FLOOD) {
-      call Flooding.Flood(myMsg);
-      dbg(GENERAL_CHANNEL, "Flooding protocol being called in here\n");
-   }
-
-   return msg;
-
-
-      //dbg (GENERAL_CHANNEL, "we received a packet"); 
-     // dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
+///
+event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
+      if(len==sizeof(pack)){
+      	 pack* myMsg = (pack*) payload;
+      	 // Don't print messages from neighbor probe packets or DV packets or TCP packets
+      	 if( strcmp( (char*)(myMsg->payload), "NeighborProbing") && (myMsg->protocol) != PROTOCOL_DV && myMsg->protocol != PROTOCOL_TCP && myMsg->protocol != PROTOCOL_LS && myMsg->protocol != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY) {
+      		dbg(GENERAL_CHANNEL, "Packet Received\n");
+      	 	//dbg(GENERAL_CHANNEL, "%d\n", myMsg -> protocol);
+            dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
+      	 }
+         if(myMsg->protocol == PROTOCOL_DV) {
+         	//dbg(GENERAL_CHANNEL, "Distance Vector Protocol\n");
+           	//call DistanceVectorRouting.handleDV(myMsg);
+         }
+         else if (myMsg->dest == 0) {
+            //dbg(GENERAL_CHANNEL, "Neighbor Discovery called\n");
+      		call NeighborDiscovery.discover(myMsg);
+      	 }
+          else if(myMsg -> protocol == PROTOCOL_LS){
+            call LinkStateRouting.handleLS(myMsg);       //Proj 4 integration
+          }
+          else {
+            //dbg(GENERAL_CHANNEL, "Got Here\n");
+            //call Flooding.Flood(myMsg);
+            //call DistanceVectorRouting.routePacket(myMsg);
+            call LinkStateRouting.routePacket(myMsg);  //Proj4 integration
+          }
+         return msg;
+      }
+      // print these only when packet not recognized
+      dbg(GENERAL_CHANNEL, "Packet Received\n");
+      dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       return msg;
    }
+/////////////////////////////////////////////
+ 
    
 
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
