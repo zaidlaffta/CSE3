@@ -71,7 +71,7 @@ implementation{
          call Flooding.Flood(myMsg);
          dbg(GENERAL_CHANNEL, "This Flooding protocol working");
       }*/
-      else if{
+      
          else if (myMsg->protocol == PROTOCOL_FLOOD) {
          call Flooding.Flood(myMsg);
          dbg(GENERAL_CHANNEL, "Flooding protecover being called in here")
@@ -83,7 +83,7 @@ implementation{
       dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       return msg;
    }
-   }
+   
 
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
       dbg(GENERAL_CHANNEL, "PING EVENT \n");
