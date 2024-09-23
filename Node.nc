@@ -73,10 +73,8 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
       	 }
           
           else {
-            //dbg(GENERAL_CHANNEL, "Got Here\n");
-            //call Flooding.Flood(myMsg);
-            //call DistanceVectorRouting.routePacket(myMsg);
-            call LinkStateRouting.routePacket(myMsg);  //Proj4 integration
+            dbg(GENERAL_CHANNEL, "Got Here\n");
+            call Flooding.Flood(myMsg);
           }
          return msg;
       }
