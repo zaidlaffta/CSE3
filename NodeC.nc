@@ -8,8 +8,12 @@
  */
 
 #include <Timer.h>
-#include "includes/CommandMsg.h"
+#include "includes/command.h"
 #include "includes/packet.h"
+#include "includes/CommandMsg.h"
+#include "includes/sendInfo.h"
+#include "includes/channels.h"
+#include <string.h>
 
 configuration NodeC{
 }
@@ -30,4 +34,12 @@ implementation {
 
     components CommandHandlerC;
     Node.CommandHandler -> CommandHandlerC;
+
+    // add components for FloodingC
+    Node.Flooding ->FloodingC;
+    // Adding neighbor discovery as component
+    components NeighborDiscoveryC;
+    Node.NeighborDiscovery -> NeighborDiscoveryC;
+
+
 }

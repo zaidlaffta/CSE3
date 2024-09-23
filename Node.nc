@@ -12,8 +12,16 @@
 #include "includes/CommandMsg.h"
 #include "includes/sendInfo.h"
 #include "includes/channels.h"
+#include <string.h>
+
 
 module Node{
+   //connecting flooding module 
+   uses interface Flooding as Flooding;
+   //connecting neighbor discovery module
+   uses interface NeighborDiscovery as NeighborDiscovery;
+
+   //existing code givne by the instractor
    uses interface Boot;
    uses interface SplitControl as AMControl;
    uses interface Receive;
@@ -32,8 +40,9 @@ implementation{
 
    event void Boot.booted(){
       call AMControl.start();
-
       dbg(GENERAL_CHANNEL, "Booted\n");
+      //call starting neighbordiscovery function
+      call NeighborDiscovery.start();
    }
 
    event void AMControl.startDone(error_t err){
@@ -52,10 +61,25 @@ implementation{
       if(len==sizeof(pack)){
          pack* myMsg=(pack*) payload;
          dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
-         return msg;
       }
-      /// added to handle the discovery message for testing 
-      
+      else if (myMsg->dest == 0) {
+         call NeighborDiscovery.discover(myMsg);
+         dbg(GENERAL_CHANNEL, "Neighbor Discovery being called in here\n");
+
+      }
+      /*else if {
+         call Flooding.Flood(myMsg);
+         dbg(GENERAL_CHANNEL, "This Flooding protocol working");
+      }*/
+      else if{
+         else if (myMsg->protocol == PROTOCOL_FLOOD) {
+         call Flooding.Flood(myMsg);
+         dbg(GENERAL_CHANNEL, "Flooding protecover being called in here")
+      }
+
+         return msg;
+
+      dbg (GENERAL_CHANNEL, "we received a packet"); 
       dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       return msg;
    }
@@ -67,7 +91,13 @@ implementation{
       call Sender.send(sendPackage, destination);
    }
 
-   event void CommandHandler.printNeighbors(){}
+   //new implementation for Command Handler for Flooding
+   event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
+      call Flooding.ping(destination, payload);
+}
+   event void CommandHandler.printNeighbors(){
+      call NeighborDiscovery.printNeighbors();
+   }
 
    event void CommandHandler.printRouteTable(){}
 
