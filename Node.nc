@@ -25,17 +25,14 @@ module Node{
    uses interface Boot;
    uses interface SplitControl as AMControl;
    uses interface Receive;
-  
    uses interface SimpleSend as Sender;
    uses interface CommandHandler;
 }
 
 implementation{
    pack sendPackage;
-
-   // Prototypes
+   // make packet given in the lab
    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
-
    event void Boot.booted(){
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
@@ -54,17 +51,21 @@ implementation{
 
    event void AMControl.stopDone(error_t err){}
 
-///
+// Int to count number of times neighbor discovery executed 
 int Neighbor_protocol = 0;
+// int to count number of times Flooding executed 
 int FLOODING_Protocol = 0;
+
 event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
       if(len==sizeof(pack)){
       	 pack* myMsg = (pack*) payload;
       	 // Don't print messages from neighbor probe packets or DV packets or 
       	 if( strcmp( (char*)(myMsg->payload), "NeighborProbing") && (myMsg->protocol) != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY) {
-      		dbg(GENERAL_CHANNEL, "Packet Received\n");
-      	 	dbg(GENERAL_CHANNEL, "%d\n", myMsg -> protocol);
+      		//debug is the packet receviced in the right protocol form 
+            dbg(GENERAL_CHANNEL, "Packet Received\n");
+      	 	
             dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
+            dbg(GENERAL_CHANNEL, "%d\n", myMsg -> protocol);
       	 }
          
          else if (myMsg->dest == 0) {
@@ -83,6 +84,7 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
          return msg;
       }
       // debug statement if the packet received is not correct or currpted. 
+      dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       dbg(GENERAL_CHANNEL, "Packet Received\n");
       dbg(GENERAL_CHANNEL, "This is currpted packet \n");
       return msg;
@@ -95,16 +97,15 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
    dbg(GENERAL_CHANNEL, "PING EVENT\n");
    makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
    call Sender.send(sendPackage, destination);
-
+   //Calling Flood protocol here
    dbg(GENERAL_CHANNEL, "Calling Flooding ping\n");
    call Flooding.ping(destination, payload);
 }
 
-  
-     
-
+  // 
    event void CommandHandler.printNeighbors(){
       call NeighborDiscovery.printNeighbors();
+      dbg(GENERAL_CHANNEL, "Command")
    }
 
    event void CommandHandler.printRouteTable(){}

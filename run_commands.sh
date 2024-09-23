@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#This is simple script used by the author to run the below commands when testing the code. 
 # Go to the parent directory
 cd ..
 
