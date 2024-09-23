@@ -89,6 +89,7 @@ implementation{
       dbg(GENERAL_CHANNEL, "PING EVENT \n");
       makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
       call Sender.send(sendPackage, destination);
+      
       dbg(GENERAL_CHANNEL, "Calling Flooding ping ");
       call Flooding.ping(destination, payload);
    }
