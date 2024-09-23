@@ -56,7 +56,7 @@ implementation{
 
  event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
    dbg(GENERAL_CHANNEL, "Packet Received\n");
-   pack* myMsg = (pack*) payload;  // Declaring myMsg outside of the if block
+//   pack* myMsg = (pack*) payload;  // Declaring myMsg outside of the if 
    
    if(len == sizeof(pack)){
       dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
