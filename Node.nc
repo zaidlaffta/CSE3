@@ -111,8 +111,9 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
 
   // 
    event void CommandHandler.printNeighbors(){
+      
       call NeighborDiscovery.printNeighbors();
-      dbg(GENERAL_CHANNEL, "Command")
+      dbg(GENERAL_CHANNEL, "Command");
    }
 
    event void CommandHandler.printRouteTable(){}
