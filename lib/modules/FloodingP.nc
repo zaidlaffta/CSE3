@@ -2,7 +2,6 @@
 //Project 1
 
 #include "../../includes/channels.h"
-#include "../../includes/lsp.h"
 #include "../../includes/CommandMsg.h"
 #include "../../includes/packet.h"
 #include "../../includes/protocol.h"
