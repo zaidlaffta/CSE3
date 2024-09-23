@@ -89,8 +89,8 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
    }
 /////////////////////////////////////////////
  
-   dbg(GENERAL_CHANNEL, "Total Neighbor Discovery %d, \n", Neighbor_protocol);
-   dbg(GENERAL_CHANNEL, "Total Flooding %d, \n", FLOODING_Protocol);
+   dbg(GENERAL_CHANNEL, "Total Neighbor Discovery %d \n", Neighbor_protocol);
+   dbg(GENERAL_CHANNEL, "Total Flooding %d \n", FLOODING_Protocol);
 
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
    dbg(GENERAL_CHANNEL, "PING EVENT\n");
