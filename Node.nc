@@ -59,7 +59,7 @@ implementation{
 //   pack* myMsg = (pack*) payload;  // Declaring myMsg outside of the if 
    
    if(len == sizeof(pack)){
-      dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
+     // dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
    }
    else if (myMsg->dest == 0) {
       call NeighborDiscovery.discover(myMsg);
