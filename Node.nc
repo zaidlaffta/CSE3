@@ -26,9 +26,7 @@ module Node{
    uses interface SplitControl as AMControl;
    uses interface Receive;
   
-
    uses interface SimpleSend as Sender;
-
    uses interface CommandHandler;
 }
 
@@ -56,43 +54,40 @@ implementation{
 
    event void AMControl.stopDone(error_t err){}
 
-   event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
-      dbg(GENERAL_CHANNEL, "Packet Received\n");
-      if(len==sizeof(pack)){
-         pack* myMsg=(pack*) payload;
-         dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
-      }
-      else if (myMsg->dest == 0) {
-         call NeighborDiscovery.discover(myMsg);
-         dbg(GENERAL_CHANNEL, "Neighbor Discovery being called in here\n");
+ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
+   dbg(GENERAL_CHANNEL, "Packet Received\n");
+   pack* myMsg = (pack*) payload;  // Declaring myMsg outside of the if block
+   
+   if(len == sizeof(pack)){
+      dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
+   }
+   else if (myMsg->dest == 0) {
+      call NeighborDiscovery.discover(myMsg);
+      dbg(GENERAL_CHANNEL, "Neighbor Discovery being called in here\n");
 
-      }
-      /*else if {
-         call Flooding.Flood(myMsg);
-         dbg(GENERAL_CHANNEL, "This Flooding protocol working");
-      }*/
-      
-         else if (myMsg->protocol == PROTOCOL_FLOOD) {
-         call Flooding.Flood(myMsg);
-         dbg(GENERAL_CHANNEL, "Flooding protecover being called in here")
-      }
+   }
+   else if (myMsg->protocol == PROTOCOL_FLOOD) {
+      call Flooding.Flood(myMsg);
+      dbg(GENERAL_CHANNEL, "Flooding protocol being called in here\n");
+   }
 
-         return msg;
+   return msg;
 
-      dbg (GENERAL_CHANNEL, "we received a packet"); 
-      dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
+
+      //dbg (GENERAL_CHANNEL, "we received a packet"); 
+     // dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       return msg;
    }
    
 
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
-      dbg(GENERAL_CHANNEL, "PING EVENT \n");
-      makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
-      call Sender.send(sendPackage, destination);
-      
-      dbg(GENERAL_CHANNEL, "Calling Flooding ping ");
-      call Flooding.ping(destination, payload);
-   }
+   dbg(GENERAL_CHANNEL, "PING EVENT\n");
+   makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
+   call Sender.send(sendPackage, destination);
+
+   dbg(GENERAL_CHANNEL, "Calling Flooding ping\n");
+   call Flooding.ping(destination, payload);
+}
 
   
      
