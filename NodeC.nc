@@ -36,7 +36,8 @@ implementation {
     Node.CommandHandler -> CommandHandlerC;
 
     // add components for FloodingC
-    Node.Flooding ->FloodingC;
+     components FloodingC;
+    Node.Flooding -> FloodingC;
     // Adding neighbor discovery as component
     components NeighborDiscoveryC;
     Node.NeighborDiscovery -> NeighborDiscoveryC;

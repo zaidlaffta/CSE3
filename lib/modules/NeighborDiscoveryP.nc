@@ -45,8 +45,8 @@ implementation {
     }
 
     event void Timer.fired() {
-        dbg(NEIGHBOR_CHANNEL, "In Timer fired\n");
-        dbg(GENERAL_CHANNEL, "In timer fired\n");
+       // dbg(NEIGHBOR_CHANNEL, "In Timer fired\n");
+      //  dbg(GENERAL_CHANNEL, "In timer fired\n");
 
         uint32_t* neighbors = call NeighborTable.getKeys();
         uint8_t payload = 0;
@@ -67,8 +67,8 @@ implementation {
         }
         dbg(NEIGHBOR_CHANNEL, "In Timer fired 2\n");//can be commented 
         makePack(&sendp, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &payload, PACKET_MAX_PAYLOAD_SIZE);
-        dbg(NEIGHBOR_CHANNEL, "In Timer fired 4\n");//can be commented 
-        dbg(GENERAL_CHANNEL, "Sending ping from NeighborDiscovery to %d\n", );
+        //dbg(NEIGHBOR_CHANNEL, "In Timer fired 4\n");//can be commented 
+       // dbg(GENERAL_CHANNEL, "Sending ping from NeighborDiscovery to %d\n", );
         call Sender.send(sendp, AM_BROADCAST_ADDR);
     }
 

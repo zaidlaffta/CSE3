@@ -83,18 +83,19 @@ implementation{
       dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
       return msg;
    }
-
+   }
 
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
       dbg(GENERAL_CHANNEL, "PING EVENT \n");
       makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
       call Sender.send(sendPackage, destination);
+      dbg(GENERAL_CHANNEL, "Calling Flooding ping ");
+      call Flooding.ping(destination, payload);
    }
 
-   //new implementation for Command Handler for Flooding
-   event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
-      call Flooding.ping(destination, payload);
-}
+  
+     
+
    event void CommandHandler.printNeighbors(){
       call NeighborDiscovery.printNeighbors();
    }
