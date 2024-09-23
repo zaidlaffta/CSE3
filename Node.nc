@@ -85,12 +85,13 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
       // print these only when packet not recognized
       dbg(GENERAL_CHANNEL, "Packet Received\n");
       dbg(GENERAL_CHANNEL, "Unknown Packet Type %d\n", len);
+      dbg(GENERAL_CHANNEL, "Total Neighbor Discovery %d \n", Neighbor_protocol);
+      dbg(GENERAL_CHANNEL, "Total Flooding %d \n", FLOODING_Protocol);
       return msg;
    }
 /////////////////////////////////////////////
  
-   dbg(GENERAL_CHANNEL, "Total Neighbor Discovery %d \n", Neighbor_protocol);
-   dbg(GENERAL_CHANNEL, "Total Flooding %d \n", FLOODING_Protocol);
+ 
 
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload){
    dbg(GENERAL_CHANNEL, "PING EVENT\n");
