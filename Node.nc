@@ -66,15 +66,12 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
       	 }
          if(myMsg->protocol == PROTOCOL_DV) {
          	//dbg(GENERAL_CHANNEL, "Distance Vector Protocol\n");
-           	//call DistanceVectorRouting.handleDV(myMsg);
          }
          else if (myMsg->dest == 0) {
             //dbg(GENERAL_CHANNEL, "Neighbor Discovery called\n");
       		call NeighborDiscovery.discover(myMsg);
       	 }
-          else if(myMsg -> protocol == PROTOCOL_LS){
-            call LinkStateRouting.handleLS(myMsg);       //Proj 4 integration
-          }
+          
           else {
             //dbg(GENERAL_CHANNEL, "Got Here\n");
             //call Flooding.Flood(myMsg);
