@@ -51,7 +51,7 @@ implementation{
 
    event void AMControl.stopDone(error_t err){
       if(err != SUCCESS){
-         dbg(GENERAL_CHANNEL, "Radio is not working \n")
+         dbg(GENERAL_CHANNEL, "Radio is not working \n");
       }else{
          //retray again!
          call AMControl.start();
