@@ -7,7 +7,7 @@
 #include "../../includes/protocol.h"
 #include "../../includes/sendInfo.h"
 
-
+#define TTL_COMPARE = 120;
 
 module FloodingP {
     // This module provides the Flooding interface, allowing other modules to access
@@ -22,13 +22,20 @@ implementation {
 	uint16_t sequenceNum = 0;
 
 	void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
+        //set source node ID
         Package->src = src;
+        //set Node destination ID
         Package->dest = dest;
+        //Set time to live
         Package->TTL = TTL;
+        //Set sequence number
         Package->seq = seq;
+        //Set protocol type
         Package->protocol = protocol;
+        //Copy payload into the packet
         memcpy(Package->payload, payload, length);
     }
+
     bool containsval(uint32_t key, uint32_t val) {
     	if(call PreviousPackets.contains(key)) {
     		if(call PreviousPackets.get(key) == val) {
