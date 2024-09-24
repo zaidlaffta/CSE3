@@ -79,14 +79,14 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
             //dbg(GENERAL_CHANNEL, "Neighbor Discovery called here \n");
       		call NeighborDiscovery.discover(myMsg);
             Neighbor_protocol++;
-            dbg(GENERAL_CHANNEL, "number of times Neighbor Discovery Called %d \n", Neighbor_protocol);
+            //dbg(GENERAL_CHANNEL, "number of times Neighbor Discovery Called %d \n", Neighbor_protocol);
       	 }
           
           else {
             //dbg(GENERAL_CHANNEL, "Flooding function called here\n");
             call Flooding.Flood(myMsg);
             FLOODING_Protocol++;
-            dbg(GENERAL_CHANNEL, "number of time Flooding Protocal Executed %d \n", FLOODING_Protocol);
+            //dbg(GENERAL_CHANNEL, "number of time Flooding Protocal Executed %d \n", FLOODING_Protocol);
           }
          return msg;
       }
