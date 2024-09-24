@@ -10,12 +10,13 @@ configuration FloodingC {
 }
 
 implementation {
-	// The FloodingC component uses the FloodingP module for its implementation.
+	// The FloodingC component 
 	components FloodingP;
 	Flooding = FloodingP;
-
 	// Instantiate a HashMap component to store previously received packets to avoid redundant flooding.
-	components new HashmapC(uint32_t, 20);
+	components new HashmapC(uint32_t, 25);
+
+	//Wiring for Flooding
     //used as a packet identifyer - mentioned in the Lab by Jothi
 	FloodingP.PreviousPackets -> HashmapC;
 	// Instantiate the SimpleSendC component for sending messages using the Active Message (AM) protocol.

@@ -14,6 +14,8 @@ implementation {
     components NeighborDiscoveryP;
     NeighborDiscovery = NeighborDiscoveryP;
 
+
+    //Wiring for the NeighborDiscovery module
     // The RandomC component is used for generating random numbers,
     components RandomC as Random;
     NeighborDiscoveryP.Random -> Random;
