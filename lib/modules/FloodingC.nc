@@ -28,12 +28,3 @@ implementation {
 	// Wire SimpleSendC component for sending messages using the Active Message (AM) protocol.
 	FloodingP.simpleSend -> SimpleSendC;
 }
-implementation {
-	components FloodingP;
-	Flooding = FloodingP;
-
-	components new SimpleSendC(AM_PACK);
-    FloodingP.simpleSend -> SimpleSendC;
-
-    components new HashmapC(uint32_t, 20);
-    FloodingP.PreviousPackets -> HashmapC;}
