@@ -11,7 +11,7 @@
 
 module FloodingP {
 	provides interface Flooding;
-	uses interface SimpleSend as packetSend;
+	uses interface SimpleSend as SimpleSend;
 	uses interface Hashmap<uint32_t> as PreviousPackets;
 }
 implementation {
@@ -40,7 +40,7 @@ implementation {
         dbg(FLOODING_CHANNEL, "SENDER %d\n", TOS_NODE_ID);
         dbg(FLOODING_CHANNEL, "DEST %d\n", destination);
         makePack(&sendPackage, TOS_NODE_ID, destination, 22, PROTOCOL_PING, sequenceNum, payload, PACKET_MAX_PAYLOAD_SIZE);
-        call packetSend.send(sendPackage, AM_BROADCAST_ADDR);
+        call SimpleSend.send(sendPackage, AM_BROADCAST_ADDR);
         sequenceNum++;
     }
 
@@ -55,7 +55,7 @@ implementation {
 
                 call PreviousPackets.insert(letter -> seq, letter -> src);          
                 makePack(&sendPackage, letter -> dest, letter -> src, 10, PROTOCOL_PINGREPLY, sequenceNum++, (uint8_t *) letter -> payload, PACKET_MAX_PAYLOAD_SIZE);      
-                call packetSend.send(sendPackage, AM_BROADCAST_ADDR);                      
+                call SimpleSend.send(sendPackage, AM_BROADCAST_ADDR);                      
                 dbg(FLOODING_CHANNEL, "RePackage has been resent!...\n");               
             } else if(letter -> protocol == PROTOCOL_PINGREPLY){
                 dbg(FLOODING_CHANNEL, "RePackage has reached destination...\n");
@@ -65,7 +65,7 @@ implementation {
             letter -> TTL -= 1;                                                         
             
             call PreviousPackets.insert(letter -> seq, letter -> src);               
-            call packetSend.send(*letter, AM_BROADCAST_ADDR);                               
+            call SimpleSend.send(*letter, AM_BROADCAST_ADDR);                               
 
             dbg(FLOODING_CHANNEL, "New package has been forwarded with new Time To Live...\n"); //
         }
