@@ -11,7 +11,7 @@
 
 module FloodingP {
 	provides interface Flooding;
-	uses interface SimpleSend as simpleSend;// this is the deal
+	uses interface SimpleSend as simple;// this is the deal
 	uses interface Hashmap<uint32_t> as PreviousPackets;
 }
 implementation {
@@ -39,7 +39,7 @@ implementation {
         dbg(FLOODING_CHANNEL, "SENDER %d\n", TOS_NODE_ID);
         dbg(FLOODING_CHANNEL, "DEST %d\n", destination);
         makePack(&sendPackage, TOS_NODE_ID, destination, 22, PROTOCOL_PING, sequenceNum, payload, PACKET_MAX_PAYLOAD_SIZE);
-        call simpleSend.send(sendPackage, AM_BROADCAST_ADDR);
+        call simple.send(sendPackage, AM_BROADCAST_ADDR);
         sequenceNum++;
     }
 
@@ -54,7 +54,7 @@ implementation {
 
                 call PreviousPackets.insert(letter -> seq, letter -> src);           //Keeping track of the source of our pakets and it's respective sequence
                 makePack(&sendPackage, letter -> dest, letter -> src, 10, PROTOCOL_PINGREPLY, sequenceNum++, (uint8_t *) letter -> payload, PACKET_MAX_PAYLOAD_SIZE);     //RePacket to send to subsequent nodes
-                call simpleSend.send(sendPackage, AM_BROADCAST_ADDR);                      //Send new package to  all modules
+                call simple.send(sendPackage, AM_BROADCAST_ADDR);                      //Send new package to  all modules
                 dbg(FLOODING_CHANNEL, "RePackage has been resent!...\n");               //Debug Message being printed
             } else if(letter -> protocol == PROTOCOL_PINGREPLY){
                 dbg(FLOODING_CHANNEL, "RePackage has reached destination...\n");
@@ -64,7 +64,7 @@ implementation {
             letter -> TTL -= 1;                                                         //HANDLEFORWARD call
             
             call PreviousPackets.insert(letter -> seq, letter -> src);               //Calling to record package RECEIVED
-            call simpleSend.send(*letter, AM_BROADCAST_ADDR);                               //Module that sends packets
+            call simple.send(*letter, AM_BROADCAST_ADDR);                               //Module that sends packets
 
             dbg(FLOODING_CHANNEL, "New package has been forwarded with new Time To Live...\n"); //
         }
