@@ -18,6 +18,7 @@ implementation {
 	//Instantiate a Map component (with key as uint32_t) to track received packets.
 	components new SimpleSendC(AM_PACK);
 	//Wiring for Flooding
+	int hashPre;
     //used as a packet identifyer - mentioned in the Lab by Jothi
 	FloodingP.PreviousPackets -> HashmapC;
 	// Wire SimpleSendC component for sending messages using the Active Message (AM) protocol.
