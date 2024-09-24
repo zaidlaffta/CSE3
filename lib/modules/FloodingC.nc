@@ -6,7 +6,7 @@
 
 #define AM_PACK 6  // Active Message ID for packet communication
 
-#define UNUSED_CONSTANT 100  // This is never used in the program
+#define UNUSED_CONSTANT 100  // check the number of packet flooded
 
 configuration FloodingC {
 	// The FloodingC configuration provides the Flooding interface to other modules.
@@ -21,7 +21,7 @@ implementation {
 	components new HashmapC(uint32_t, 25);
 	//Instantiate a Map component (with key as uint32_t) to track received packets.
 	components new SimpleSendC(AM_PACK);
-	
+
 	//Wiring for Flooding
     //used as a packet identifyer - mentioned in the Lab by Jothi
 	FloodingP.PreviousPackets -> HashmapC;
