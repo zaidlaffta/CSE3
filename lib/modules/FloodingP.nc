@@ -10,8 +10,11 @@
 
 
 module FloodingP {
+    // This module provides the Flooding interface, allowing other modules to access
 	provides interface Flooding;
-	uses interface SimpleSend as packetTransmitter;// this is the deal
+    // This module uses the SimpleSend interface as packet Transmitter
+	uses interface SimpleSend as packetTransmitter;
+    // This module uses the Hashmap interface with uint32_t keysw which t oprevent packet send previously
 	uses interface Hashmap<uint32_t> as PreviousPackets;
 }
 implementation {
@@ -43,30 +46,30 @@ implementation {
         sequenceNum++;
     }
 
-    command void Flooding.Flood(pack* letter){                                 // Letter is the same as "packet"
+    command void Flooding.Flood(pack* letter){                                 
         if(containsval(letter -> seq, letter -> src)){
-            dbg(FLOODING_CHANNEL, "Duplicate packet. Will not forward...\n");           //Debugging Message PRint
-        } else if(letter -> TTL == 0) {                                                 //When the packet's time to live has expired we don't forward
+            dbg(FLOODING_CHANNEL, "Duplicate packet. Will not forward...\n");           
+        } else if(letter -> TTL == 0) {                                                 
             dbg(FLOODING_CHANNEL, "Packet has expired. Will not forward to prevent infinite loop...\n");
         } else if(letter -> dest ==  TOS_NODE_ID){
-            if(letter -> protocol == PROTOCOL_PING){                                    //inplementing HANDLE PAYLOAD RECEIVED
+            if(letter -> protocol == PROTOCOL_PING){                                    
                 dbg(FLOODING_CHANNEL, "Package has reached the destination!...\n");
 
-                call PreviousPackets.insert(letter -> seq, letter -> src);           //Keeping track of the source of our pakets and it's respective sequence
+                call PreviousPackets.insert(letter -> seq, letter -> src);           
                 makePack(&sendPackage, letter -> dest, letter -> src, 10, PROTOCOL_PINGREPLY, sequenceNum++, (uint8_t *) letter -> payload, PACKET_MAX_PAYLOAD_SIZE);     //RePacket to send to subsequent nodes
-                call packetTransmitter.send(sendPackage, AM_BROADCAST_ADDR);                      //Send new package to  all modules
-                dbg(FLOODING_CHANNEL, "RePackage has been resent!...\n");               //Debug Message being printed
+                call packetTransmitter.send(sendPackage, AM_BROADCAST_ADDR);                      
+                dbg(FLOODING_CHANNEL, "RePackage has been resent!...\n");               
             } else if(letter -> protocol == PROTOCOL_PINGREPLY){
                 dbg(FLOODING_CHANNEL, "RePackage has reached destination...\n");
-                call PreviousPackets.insert(letter -> seq, letter -> src);           //Login PAcket information into the Maplist
+                call PreviousPackets.insert(letter -> seq, letter -> src);           
             }
         } else {
-            letter -> TTL -= 1;                                                         //HANDLEFORWARD call
+            letter -> TTL -= 1;                                                         
             
-            call PreviousPackets.insert(letter -> seq, letter -> src);               //Calling to record package RECEIVED
-            call packetTransmitter.send(*letter, AM_BROADCAST_ADDR);                               //Module that sends packets
+            call PreviousPackets.insert(letter -> seq, letter -> src);               
+            call packetTransmitter.send(*letter, AM_BROADCAST_ADDR);                               
 
             dbg(FLOODING_CHANNEL, "New package has been forwarded with new Time To Live...\n"); //
         }
-    }//end of function
+    }
 }
