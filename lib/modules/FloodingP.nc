@@ -11,7 +11,7 @@
 
 module FloodingP {
 	provides interface Flooding;
-	uses interface SimpleSend as SimpleSend;
+	uses interface SimpleSend as simpleSend;// this is the deal
 	uses interface Hashmap<uint32_t> as PreviousPackets;
 }
 implementation {
@@ -33,7 +33,7 @@ implementation {
     		}
     	}
     }
-
+dbg(GENERAL_CHANNEL, "this is a tes");
     command void Flooding.ping(uint16_t destination, uint8_t *payload) {
         dbg(FLOODING_CHANNEL, "PING EVENT \n");
         dbg(FLOODING_CHANNEL, "SENDER %d\n", TOS_NODE_ID);
