@@ -20,7 +20,6 @@ implementation {
 	//Wiring for Flooding
     //used as a packet identifyer - mentioned in the Lab by Jothi
 	FloodingP.PreviousPackets -> HashmapC;
-	// Instantiate the SimpleSendC component for sending messages using the Active Message (AM) protocol.
-	
+	// Wire SimpleSendC component for sending messages using the Active Message (AM) protocol.
 	FloodingP.simpleSend -> SimpleSendC;
 }

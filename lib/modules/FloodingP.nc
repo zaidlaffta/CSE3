@@ -7,6 +7,11 @@
 #include "../../includes/protocol.h"
 #include "../../includes/sendInfo.h"
 
+#include <Timer.h>
+#include "includes/command.h"
+#include "includes/packet.h"
+#include <string.h>
+
 module FloodingP {
 	provides interface Flooding;
 	uses interface SimpleSend as simpleSend;
