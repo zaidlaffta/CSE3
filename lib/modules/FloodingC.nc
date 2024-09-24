@@ -4,6 +4,10 @@
 #include "../../includes/command.h"
 #include "../../includes/channels.h"
 
+#define AM_PACK 6  // Active Message ID for packet communication
+
+#define UNUSED_CONSTANT 100  // This is never used in the program
+
 configuration FloodingC {
 	// The FloodingC configuration provides the Flooding interface to other modules.
 	provides interface Flooding;
@@ -17,8 +21,8 @@ implementation {
 	components new HashmapC(uint32_t, 25);
 	//Instantiate a Map component (with key as uint32_t) to track received packets.
 	components new SimpleSendC(AM_PACK);
+	
 	//Wiring for Flooding
-	int hashPre;
     //used as a packet identifyer - mentioned in the Lab by Jothi
 	FloodingP.PreviousPackets -> HashmapC;
 	// Wire SimpleSendC component for sending messages using the Active Message (AM) protocol.
