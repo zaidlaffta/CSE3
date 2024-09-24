@@ -21,7 +21,17 @@ implementation {
 	pack sendPackage;
 	uint16_t sequenceNum = 0;
 
-	void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
+	
+
+    bool containsval(uint32_t key, uint32_t val) {
+    	if(call PreviousPackets.contains(key)) {
+    		if(call PreviousPackets.get(key) == val) {
+    			return TRUE;
+    		}
+    	}
+    }
+    //function to make a packet extracted from Node.nc file
+    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
         //set source node ID
         Package->src = src;
         //set Node destination ID
@@ -34,14 +44,6 @@ implementation {
         Package->protocol = protocol;
         //Copy payload into the packet
         memcpy(Package->payload, payload, length);
-    }
-
-    bool containsval(uint32_t key, uint32_t val) {
-    	if(call PreviousPackets.contains(key)) {
-    		if(call PreviousPackets.get(key) == val) {
-    			return TRUE;
-    		}
-    	}
     }
 
     command void Flooding.ping(uint16_t destination, uint8_t *payload) {
