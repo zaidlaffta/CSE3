@@ -16,13 +16,11 @@ implementation {
 	// Instantiate a HashMap component to store previously received packets to avoid redundant flooding.
 	components new HashmapC(uint32_t, 25);
 	//Instantiate a Map component (with key as uint32_t) to track received packets.
-	components new MapC(uint32_t, 20);
-
+	components new SimpleSendC(AM_PACK);
 	//Wiring for Flooding
     //used as a packet identifyer - mentioned in the Lab by Jothi
 	FloodingP.PreviousPackets -> HashmapC;
-	FloodingP.PreviousPackets ->MapC;
 	// Instantiate the SimpleSendC component for sending messages using the Active Message (AM) protocol.
-	components new SimpleSendC(AM_PACK);
+	
 	FloodingP.simpleSend -> SimpleSendC;
 }
