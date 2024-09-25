@@ -16,6 +16,8 @@ module FloodingP {
 	uses interface SimpleSend as packetTransmitter;
     // This module uses the Hashmap interface with uint32_t keysw which t oprevent packet send previously
 	uses interface Hashmap<uint32_t> as PreviousPackets;
+    uses interface Timer<TMilli> as PrintTimer;
+
 }
 implementation {
 	pack sendPackage;
@@ -59,6 +61,13 @@ implementation {
         sequenceNum++;
     }
 
+
+    command error_t Flooding.start() {
+    call PrintTimer.startPeriodic(500); // Print every 500 ms 
+    return SUCCESS;
+    }
+
+
     command void Flooding.Flood(pack* letter){                                 
         if(containsval(letter -> seq, letter -> src)){
             dbg(FLOODING_CHANNEL, "Duplicate packet. Will not forward...\n");           
@@ -87,4 +96,8 @@ implementation {
             dbg(FLOODING_CHANNEL, "New package has been forwarded with new Time To Live...\n"); //
         }
     }
+    event void PrintTimer.fired() {
+    dbg(FLOODING_CHANNEL, "Periodic Report: Total Flooded Packets: %d\n", floodedPacketCount);
+    }
+
 }
