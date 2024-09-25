@@ -100,11 +100,7 @@ implementation {
             dbg(FLOODING_CHANNEL, "New package has been forwarded with new Time To Live...\n"); //
         }
     }
-    if (letter->TTL == 0) {
-    dbg(GENERAL_CHANNEL, "Packet will be dropped as TTL is 0\n");  // Correct message formatting
-    dbg(FLOODING_CHANNEL, "Periodic Report: Total Flooded Packets: %d\n", floodedPacketCount);  // Correct debug message format
-    return;  // Exit the function to drop the packet
-}
+    
 
 
 }
