@@ -105,7 +105,7 @@ implementation {
     uint16_t i;
 
     // Manually remove each neighbor from the neighbor table
-    for (i = 0; i < call NeighborTable.size(); i++) {
+    for (int i = 0; i < call NeighborTable.size(); i++) {
         if (neighbors[i] != 0) {
             call NeighborTable.remove(neighbors[i]);
             dbg(NEIGHBOR_CHANNEL, "Removed neighbor %d\n", neighbors[i]);
