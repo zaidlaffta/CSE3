@@ -33,6 +33,8 @@ implementation {
     			return TRUE;
     		}
     	}
+        return FALSE;
+
     }
     //function to make a packet extracted from Node.nc file
     void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
@@ -62,12 +64,12 @@ implementation {
         sequenceNum++;
     }
 
-
+/*
     command error_t Flooding.start() {
     call PrintTimer.startPeriodic(500); // Print every 500 ms 
     return SUCCESS;
     }
-
+*/
 
     command void Flooding.Flood(pack* letter){                                 
         if(containsval(letter -> seq, letter -> src)){
