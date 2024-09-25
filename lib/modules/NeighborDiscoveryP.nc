@@ -7,6 +7,114 @@
 
 #define NODETIMETOLIVE  22
 
+
+module NeighborDiscoveryP {
+    provides interface NeighborDiscovery;
+    uses interface Random as RandGen;
+    uses interface Timer<TMilli> as NeighborTimer;
+    uses interface Hashmap<uint32_t> as NeighborMap;
+    uses interface SimpleSend as PacketSender;
+}
+
+implementation {
+    pack packetToSend;
+
+    void preparePacket(pack *pkt, uint16_t source, uint16_t destination, uint16_t ttl, uint16_t protocolType, uint16_t sequence, uint8_t* data, uint8_t dataLength);
+
+    command error_t NeighborDiscovery.start() {
+        call NeighborTimer.startPeriodic(500 + (uint16_t)(call RandGen.rand16() % 500));
+        dbg(NEIGHBOR_CHANNEL, "Node %d: Neighbor discovery initiated\n", TOS_NODE_ID);
+        return SUCCESS;
+    }
+
+    command void NeighborDiscovery.discover(pack* receivedPacket) {
+        dbg(NEIGHBOR_CHANNEL, "NeighborDiscovery: Processing incoming packet\n");
+
+        if (receivedPacket->TTL > 0 && receivedPacket->protocol == PROTOCOL_PING) {
+            dbg(NEIGHBOR_CHANNEL, "Processing PING packet\n");
+            receivedPacket->TTL--;
+            receivedPacket->src = TOS_NODE_ID;
+            receivedPacket->protocol = PROTOCOL_PINGREPLY;
+            call PacketSender.send(*receivedPacket, AM_BROADCAST_ADDR);
+        } 
+        else if (receivedPacket->protocol == PROTOCOL_PINGREPLY && receivedPacket->dest == 0) {
+            dbg(NEIGHBOR_CHANNEL, "Received PING REPLY, Neighbor confirmed: %d\n", receivedPacket->src);
+            if (!call NeighborMap.contains(receivedPacket->src)) {
+                call NeighborMap.insert(receivedPacket->src, NODETIMETOLIVE);
+            }
+        }
+    }
+
+    event void NeighborTimer.fired() {
+        uint32_t* neighborList = call NeighborMap.getKeys();
+        uint8_t payloadData = 0;
+        uint16_t idx = 0;
+
+        dbg(NEIGHBOR_CHANNEL, "NeighborTimer fired: Checking neighbors\n");
+
+        for (idx = 0; idx < call NeighborMap.size(); idx++) {
+            if (neighborList[idx] == 0) {
+                continue;
+            }
+            if (call NeighborMap.get(neighborList[idx]) == 0) {
+                dbg(NEIGHBOR_CHANNEL, "Neighbor %d has expired, removing\n", neighborList[idx]);
+                call NeighborMap.remove(neighborList[idx]);
+            } 
+            else {
+                call NeighborMap.insert(neighborList[idx], call NeighborMap.get(neighborList[idx]) - 1);
+            }
+        }
+
+        dbg(NEIGHBOR_CHANNEL, "Preparing new PING packet\n");
+        preparePacket(&packetToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &payloadData, PACKET_MAX_PAYLOAD_SIZE);
+        call PacketSender.send(packetToSend, AM_BROADCAST_ADDR);
+    }
+
+    command uint32_t* NeighborDiscovery.getNeighbors() {
+        return call NeighborMap.getKeys();
+    }
+
+    command uint16_t NeighborDiscovery.getNeighborCount() {
+        return call NeighborMap.size();
+    }
+
+    void preparePacket(pack *pkt, uint16_t source, uint16_t destination, uint16_t ttl, uint16_t protocolType, uint16_t sequence, uint8_t* data, uint8_t dataLength) {
+        dbg(NEIGHBOR_CHANNEL, "Preparing packet with TTL: %d\n", ttl);
+        pkt->src = source;
+        pkt->dest = destination;
+        pkt->TTL = ttl;
+        pkt->seq = sequence;
+        pkt->protocol = protocolType;
+        memcpy(pkt->payload, data, dataLength);
+    }
+
+    command void NeighborDiscovery.printNeighborList() {
+        uint16_t i = 0;
+        uint32_t* neighbors = call NeighborMap.getKeys();
+        dbg(NEIGHBOR_CHANNEL, "Listing neighbors:\n");
+        for (i = 0; i < call NeighborMap.size(); i++) {
+            if (neighbors[i] != 0) {
+                dbg(NEIGHBOR_CHANNEL, "\tNeighbor ID: %d\n", neighbors[i]);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 module NeighborDiscoveryP {
 	provides interface NeighborDiscovery;
     uses interface Random as Random;
@@ -95,4 +203,4 @@ implementation {
     }
 
 }
-
+*/
