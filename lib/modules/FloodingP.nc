@@ -187,4 +187,17 @@ implementation {
                 dbg(FLOODING_CHANNEL, "Ping reply received at destination\n");
                 call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
             }
-       
+        } 
+        // Otherwise, forward the packet to the next node
+        else {
+            incomingPacket->TTL--;                       // Decrease TTL to avoid infinite forwarding
+            call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
+            call packetTransmitter.send(*incomingPacket, AM_BROADCAST_ADDR);
+            totalFloodedPackets++;                       // Increment the flooded packet count
+
+            // Print debug messages for tracking
+            dbg(FLOODING_CHANNEL, "Total flooded packets: %d\n", totalFloodedPackets);
+            dbg(FLOODING_CHANNEL, "Packet forwarded with reduced TTL\n");
+        }
+    }
+}
