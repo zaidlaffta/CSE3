@@ -10,9 +10,7 @@ interface NeighborDiscovery {
    	command uint32_t* getNeighbors();
    	command uint16_t getNeighborListSize();
 	
-    command void logNeighborCount();
-    command void resetNeighborTable();
-    command void logPacket(pack* packet);
+    
 
 
 
