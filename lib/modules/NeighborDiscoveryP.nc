@@ -30,7 +30,7 @@ implementation {
         return SUCCESS;
     }
 ///////////////////////////
-implementation {
+
 
     // Original code...
 
@@ -56,7 +56,7 @@ implementation {
 
     // Original functions...
 
-}
+
 ///////////////////////
 
 
