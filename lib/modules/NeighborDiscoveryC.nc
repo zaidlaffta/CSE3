@@ -2,6 +2,8 @@
 #include <Timer.h>
 #include "../../includes/CommandMsg.h"
 #include "../../includes/packet.h"
+#include "../../includes/command.h"
+#include "../../includes/channels.h"
 
 configuration NeighborDiscoveryC {
     // Provides the NeighborDiscovery interface to other modules.
