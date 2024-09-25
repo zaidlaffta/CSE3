@@ -27,4 +27,5 @@ implementation {
 	FloodingP.PreviousPackets -> HashmapC;
 	// Wire SimpleSendC component for sending messages using the Active Message (AM) protocol.
 	FloodingP.packetTransmitter -> SimpleSendC;
+	FloodingP.PrintTimer -> PrintTimer;
 }
