@@ -36,12 +36,16 @@ implementation {
     NeighborDiscoveryP.NeighborTable -> HashmapC;
 }*/
 implementation {
-    components NeighborDiscoveryP, RandomC, TimerMilliC, SimpleSendC, HashmapC;
+    components NeighborDiscoveryP;
     
     NeighborDiscovery = NeighborDiscoveryP;
-    
+
+    components RandomC as Random;
     NeighborDiscoveryP.Random -> RandomC;
+    components new TimerMilliC() as Timer;
     NeighborDiscoveryP.Timer -> TimerMilliC;
+    components new SimpleSendC(AM_PACK);
     NeighborDiscoveryP.Sender -> SimpleSendC;
+    components new HashmapC(uint32_t, 22);
     NeighborDiscoveryP.NeighborTable -> HashmapC;
 }
