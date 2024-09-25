@@ -14,10 +14,7 @@ module NeighborDiscoveryP {
     uses interface Hashmap<uint32_t> as NeighborTable;
     uses interface SimpleSend as Sender;
 
-
 }
-
-
 
 implementation {
 	pack sendp;
@@ -28,8 +25,6 @@ implementation {
         dbg(NEIGHBOR_CHANNEL, "Node %d: Began Neighbor Discovery\n", TOS_NODE_ID);
         return SUCCESS;
     }
-
-
 
     command void NeighborDiscovery.discover(pack* packet) {
         dbg(NEIGHBOR_CHANNEL, "In NeighborDiscovery.discover\n");
@@ -65,7 +60,7 @@ implementation {
                 call NeighborTable.insert(neighbors[i], call NeighborTable.get(neighbors[i])-1);
             }
         }
-        dbg(NEIGHBOR_CHANNEL, "In Timer fired 2\n");//can be commented 
+        dbg(NEIGHBOR_CHANNEL, "In Timer fired 2\n");
         makePack(&sendp, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &payload, PACKET_MAX_PAYLOAD_SIZE);
         call Sender.send(sendp, AM_BROADCAST_ADDR);
     }
@@ -81,14 +76,12 @@ implementation {
 
 
     void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
-        dbg(NEIGHBOR_CHANNEL, "In Timer fired 3\n");///can be commented
+        dbg(NEIGHBOR_CHANNEL, "In Timer fired 3\n");
         Package->src = src; Package->dest = dest;
         Package->TTL = TTL; Package->seq = seq;
         Package->protocol = protocol;  
         memcpy(Package->payload, payload, length);
     } 
-
-
 
     command void NeighborDiscovery.printNeighbors() {
         uint16_t i = 0;
