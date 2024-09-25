@@ -98,21 +98,7 @@ implementation {
         dbg(NEIGHBOR_CHANNEL, "Total number of neighbors: %d\n", neighborCount);
     }
 
-    // Function 2: Resets the neighbor table for testing or debugging.
-   command void NeighborDiscovery.resetNeighborTable() {
-    dbg(NEIGHBOR_CHANNEL, "Resetting neighbor table...\n");
-    uint32_t* neighbors = call NeighborTable.getKeys();
-    uint16_t i;
-
-    // Manually remove each neighbor from the neighbor table
-    for (int i = 0; i < call NeighborTable.size(); i++) {
-        if (neighbors[i] != 0) {
-            call NeighborTable.remove(neighbors[i]);
-            dbg(NEIGHBOR_CHANNEL, "Removed neighbor %d\n", neighbors[i]);
-        }
-    }
-    dbg(NEIGHBOR_CHANNEL, "Neighbor table reset completed.\n");
-}
+   
 
     // Function 3: Log the contents of a packet for debugging.
     command void NeighborDiscovery.logPacket(pack* packet) {
