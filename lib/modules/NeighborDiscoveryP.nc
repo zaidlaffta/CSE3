@@ -21,26 +21,7 @@ module NeighborDiscoveryP {
 
 implementation {
 
-    // Original code...///////////////
-
-    // Function 1: Logs the total number of neighbors in the table.
-    command void NeighborDiscovery.logNeighborCount() {
-        uint16_t neighborCount = call NeighborTable.size();
-        dbg(NEIGHBOR_CHANNEL, "Total number of neighbors: %d\n", neighborCount);
-    }
-
-   
-
-    // Function 3: Log the contents of a packet for debugging.
-    command void NeighborDiscovery.logPacket(pack* packet) {
-        dbg(NEIGHBOR_CHANNEL, "Packet details - src: %d, dest: %d, TTL: %d, protocol: %d, seq: %d\n",
-            packet->src, packet->dest, packet->TTL, packet->protocol, packet->seq);
-        dbg(NEIGHBOR_CHANNEL, "Payload length: %d\n", PACKET_MAX_PAYLOAD_SIZE);
-    }
-
-    // Original functions...//////////
-
-
+    
 		
 	pack sendp;
     void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length);
