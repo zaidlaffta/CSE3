@@ -19,6 +19,7 @@ module FloodingP {
 }
 implementation {
 	pack sendPackage;
+    uint16_t floodedPacketCount = 0;  // Counter for flooded packets
 	uint16_t sequenceNum = 0;
 
 	
@@ -44,6 +45,9 @@ implementation {
         Package->protocol = protocol;
         //Copy payload into the packet
         memcpy(Package->payload, payload, length);
+    }
+    uint16_t getFloodedPacketCount() {
+        return floodedPacketCount;
     }
 
     command void Flooding.ping(uint16_t destination, uint8_t *payload) {
@@ -76,7 +80,9 @@ implementation {
             letter -> TTL -= 1;                                                         
             
             call PreviousPackets.insert(letter -> seq, letter -> src);               
-            call packetTransmitter.send(*letter, AM_BROADCAST_ADDR);                               
+            call packetTransmitter.send(*letter, AM_BROADCAST_ADDR);
+            floodedPacketCount++;
+            dbg(FLOODING_CHANNEL, "Floodpacket count is %d \n", floodedPacketCount);                               
 
             dbg(FLOODING_CHANNEL, "New package has been forwarded with new Time To Live...\n"); //
         }
