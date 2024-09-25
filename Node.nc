@@ -21,12 +21,14 @@ module Node{
    //connecting neighbor discovery module
    uses interface NeighborDiscovery as NeighborDiscovery;
    uses interface PrintTimer as PrintTimer;
+   uses interface PrintTimer;
    //existing code givne by the instractor
    uses interface Boot;
    uses interface SplitControl as AMControl;
    uses interface Receive;
    uses interface SimpleSend as Sender;
    uses interface CommandHandler;
+   
 }
 
 implementation{
