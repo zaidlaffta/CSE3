@@ -89,7 +89,7 @@ implementation {
                 call PreviousPackets.insert(letter -> seq, letter -> src);           
             }
         } else {
-            letter -> TTL -= 1;                                                         
+            letter -> TTL--;                                                         
             
             call PreviousPackets.insert(letter -> seq, letter -> src);               
             call packetTransmitter.send(*letter, AM_BROADCAST_ADDR);
