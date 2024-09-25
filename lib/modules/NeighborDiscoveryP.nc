@@ -62,8 +62,8 @@ implementation {
             }
         }
         dbg(NEIGHBOR_CHANNEL, "In Timer fired 2\n");
-        makePack(&sendp, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &payload, PACKET_MAX_PAYLOAD_SIZE);
-        call Sender.send(sendp, AM_BROADCAST_ADDR);
+        makePack(&MsgToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &payload, PACKET_MAX_PAYLOAD_SIZE);
+        call Sender.send(MsgToSend, AM_BROADCAST_ADDR);
     }
 
 
