@@ -102,9 +102,7 @@ implementation {
     }
     if (letter -> TTL == 0){
         dbg(GENERAL_CHANNEL, "packet will be dorp as TTL is 0");
-
-    }
-    dbg(FLOODING_CHANNEL, "Periodic Report: Total Flooded Packets: %d\n", floodedPacketCount);
+        dbg(FLOODING_CHANNEL, "Periodic Report: Total Flooded Packets: %d\n", floodedPacketCount);
     }
 
 }
