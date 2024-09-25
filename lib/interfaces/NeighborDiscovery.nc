@@ -8,8 +8,8 @@ interface NeighborDiscovery {
    	command void discover(pack* packet);
    	command void printNeighborList();
 
-	command void getNeighborCount();
-	//command void printNeighbors();
+	
+	command void printNeighbors();
    	command uint32_t* getNeighbors();
    	command uint16_t getNeighborListSize();
 	
