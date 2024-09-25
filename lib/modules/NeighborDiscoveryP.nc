@@ -74,7 +74,7 @@ implementation {
         return call NeighborMap.getKeys();
     }
 
-    command uint16_t NeighborDiscovery.getNeighborCount() {
+    command uint16_t NeighborDiscovery.getNeighborListSize() {
         return call NeighborMap.size();
     }
 
