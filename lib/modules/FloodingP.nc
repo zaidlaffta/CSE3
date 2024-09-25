@@ -62,12 +62,12 @@ implementation {
         sequenceNum++;
     }
 
-
+/*
     command error_t Flooding.start() {
     call PrintTimer.startPeriodic(500); // Print every 500 ms 
     return SUCCESS;
     }
-
+*/
 
     command void Flooding.Flood(pack* letter){                                 
         if(containsval(letter -> seq, letter -> src)){
