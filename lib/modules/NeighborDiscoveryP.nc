@@ -184,6 +184,14 @@ implementation {
     // Command to print the current list of neighbors
     command void NeighborDiscovery.displayNeighbors() {
         uint16_t index = 0;
-        uint32_t* neighborList = call NeighborTable.get
+        uint32_t* neighborList = call NeighborTable.getKeys();  // Get neighbor keys
+        dbg(NEIGHBOR_CHANNEL, "Neighbor List:\n");
+
+        // Loop through neighbors and print each one
+        for (index = index; index < call NeighborTable.size(); index++) {
+            if (neighborList[index] != 0) {
+                dbg(NEIGHBOR_CHANNEL, "\tNeighbor: %d\n", neighborList[index]);
+            }
+        }
     }
 }
