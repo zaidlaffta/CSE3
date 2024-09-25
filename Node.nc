@@ -26,10 +26,6 @@ module Node{
    uses interface Receive;
    uses interface SimpleSend as Sender;
    uses interface CommandHandler;
-
-   //added 
-   uses interface resetNeighborTable;
-   uses interface NeighborTable;
 }
 
 implementation{
