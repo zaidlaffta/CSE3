@@ -7,7 +7,7 @@
 #include "../../includes/protocol.h"
 #include "../../includes/sendInfo.h"
 
-#define TTL_COMPARE = 120;
+#define TTL_COMPARE = -500;
 
 module FloodingP {
     // This module provides the Flooding interface, allowing other modules to access
@@ -89,6 +89,7 @@ implementation {
                 call PreviousPackets.insert(letter -> seq, letter -> src);           
             }
         } else {
+            //reduce time to live
             letter -> TTL--;                                                         
             
             call PreviousPackets.insert(letter -> seq, letter -> src);               
@@ -98,6 +99,10 @@ implementation {
 
             dbg(FLOODING_CHANNEL, "New package has been forwarded with new Time To Live...\n"); //
         }
+    }
+    if (letter -> TTL == 0){
+        dbg(GENERAL_CHANNEL, "packet will be dorp as TTL is 0");
+
     }
     event void PrintTimer.fired() {
     dbg(FLOODING_CHANNEL, "Periodic Report: Total Flooded Packets: %d\n", floodedPacketCount);
