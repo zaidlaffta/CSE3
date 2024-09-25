@@ -185,3 +185,5 @@ implementation {
     command void NeighborDiscovery.displayNeighbors() {
         uint16_t index = 0;
         uint32_t* neighborList = call NeighborTable.get
+    }
+}
