@@ -16,6 +16,7 @@ module FloodingP {
 	uses interface SimpleSend as packetTransmitter;
     // This module uses the Hashmap interface with uint32_t keysw which t oprevent packet send previously
 	uses interface Hashmap<uint32_t> as PreviousPackets;
+    //timer to print number of flooding packets
     uses interface Timer<TMilli> as PrintTimer;
 
 }

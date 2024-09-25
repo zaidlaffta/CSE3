@@ -38,6 +38,8 @@ implementation{
       dbg(GENERAL_CHANNEL, "Booted\n");
       //call starting neighbordiscovery function
       call NeighborDiscovery.start();
+      call PrintTimer.startPeriodic(500);
+      dbg(FLOODING_CHANNEL, "time started");
    }
 
    event void AMControl.startDone(error_t err){
