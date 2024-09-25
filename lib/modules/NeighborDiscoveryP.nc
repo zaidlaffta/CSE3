@@ -2,9 +2,10 @@
 #include "../../includes/channels.h"
 #include "../../includes/packet.h"
 #include "../../includes/protocol.h"
-#include "../../includes/channels.h"
+#include "../../includes/CommandMsg.h"
+#include "../../includes/command.h"
 
-#define NODETIMETOLIVE  5
+#define NODETIMETOLIVE  22
 
 module NeighborDiscoveryP {
 	provides interface NeighborDiscovery;
@@ -45,13 +46,8 @@ implementation {
     }
 
     event void Timer.fired() {
-       // dbg(NEIGHBOR_CHANNEL, "In Timer fired\n");
-      //  dbg(GENERAL_CHANNEL, "In timer fired\n");
-
         uint32_t* neighbors = call NeighborTable.getKeys();
         uint8_t payload = 0;
-
-        // Prune inactive neighbors
         uint16_t i = 0;
         dbg(NEIGHBOR_CHANNEL, "In Timer fired\n");
 
@@ -67,8 +63,6 @@ implementation {
         }
         dbg(NEIGHBOR_CHANNEL, "In Timer fired 2\n");//can be commented 
         makePack(&sendp, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &payload, PACKET_MAX_PAYLOAD_SIZE);
-        //dbg(NEIGHBOR_CHANNEL, "In Timer fired 4\n");//can be commented 
-       // dbg(GENERAL_CHANNEL, "Sending ping from NeighborDiscovery to %d\n", );
         call Sender.send(sendp, AM_BROADCAST_ADDR);
     }
 
@@ -94,7 +88,6 @@ implementation {
     command void NeighborDiscovery.printNeighbors() {
         uint16_t i = 0;
         uint32_t* neighbors = call NeighborTable.getKeys();  
-        // Print neighbors
         dbg(NEIGHBOR_CHANNEL, "Printing Neighbors:\n");
         for(i=i; i < call NeighborTable.size(); i++) {
             if(neighbors[i] != 0) {

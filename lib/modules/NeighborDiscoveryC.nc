@@ -32,6 +32,6 @@ implementation {
     NeighborDiscoveryP.Sender -> SimpleSendC;
 
     // HashmapC is used to store discovered neighbors, it can discover up to 20 nighbors
-    components new HashmapC(uint32_t, 20);
+    components new HashmapC(uint32_t, 22);
     NeighborDiscoveryP.NeighborTable -> HashmapC;
 }
