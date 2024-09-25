@@ -20,7 +20,7 @@ module Node{
    uses interface Flooding as Flooding;
    //connecting neighbor discovery module
    uses interface NeighborDiscovery as NeighborDiscovery;
-
+   uses interface PrintTimer as PrintTimer;
    //existing code givne by the instractor
    uses interface Boot;
    uses interface SplitControl as AMControl;
