@@ -18,6 +18,7 @@ module NeighborDiscoveryP {
 }
 
 
+
 implementation {
 		
 	pack sendp;
@@ -28,6 +29,40 @@ implementation {
         dbg(NEIGHBOR_CHANNEL, "Node %d: Began Neighbor Discovery\n", TOS_NODE_ID);
         return SUCCESS;
     }
+///////////////////////////
+implementation {
+
+    // Original code...
+
+    // Function 1: Logs the total number of neighbors in the table.
+    command void NeighborDiscovery.logNeighborCount() {
+        uint16_t neighborCount = call NeighborTable.size();
+        dbg(NEIGHBOR_CHANNEL, "Total number of neighbors: %d\n", neighborCount);
+    }
+
+    // Function 2: Resets the neighbor table for testing or debugging.
+    command void NeighborDiscovery.resetNeighborTable() {
+        dbg(NEIGHBOR_CHANNEL, "Resetting neighbor table...\n");
+        call NeighborTable.clear();
+        dbg(NEIGHBOR_CHANNEL, "Neighbor table cleared.\n");
+    }
+
+    // Function 3: Log the contents of a packet for debugging.
+    command void NeighborDiscovery.logPacket(pack* packet) {
+        dbg(NEIGHBOR_CHANNEL, "Packet details - src: %d, dest: %d, TTL: %d, protocol: %d, seq: %d\n",
+            packet->src, packet->dest, packet->TTL, packet->protocol, packet->seq);
+        dbg(NEIGHBOR_CHANNEL, "Payload length: %d\n", PACKET_MAX_PAYLOAD_SIZE);
+    }
+
+    // Original functions...
+
+}
+///////////////////////
+
+
+
+
+
 
     command void NeighborDiscovery.discover(pack* packet) {
         dbg(NEIGHBOR_CHANNEL, "In NeighborDiscovery.discover\n");
