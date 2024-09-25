@@ -9,7 +9,7 @@ configuration NeighborDiscoveryC {
     // Provides the NeighborDiscovery interface to other modules.
     provides interface NeighborDiscovery;
 }
-
+/*
 implementation {
 
     // Uses the NeighborDiscoveryP module to implement the NeighborDiscovery interface.
@@ -33,5 +33,15 @@ implementation {
 
     // HashmapC is used to store discovered neighbors, it can discover up to 20 nighbors
     components new HashmapC(uint32_t, 22);
+    NeighborDiscoveryP.NeighborTable -> HashmapC;
+}*/
+implementation {
+    components NeighborDiscoveryP, RandomC, TimerMilliC, SimpleSendC, HashmapC;
+    
+    NeighborDiscovery = NeighborDiscoveryP;
+    
+    NeighborDiscoveryP.Random -> RandomC;
+    NeighborDiscoveryP.Timer -> TimerMilliC;
+    NeighborDiscoveryP.Sender -> SimpleSendC;
     NeighborDiscoveryP.NeighborTable -> HashmapC;
 }
