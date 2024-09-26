@@ -99,9 +99,12 @@ implementation {
    event void CommandHandler.printNeighbors() {  
       call NeighborDiscovery.displayNeighbors(); // Changed to displayNeighbors
       dbg(GENERAL_CHANNEL, "Command: Print Neighbors\n");
+
+      
+      all NeighborDiscovery.displayNeighbors():
+      dbg(GENERAL_CHANNEL, "Neighbor discovered in the hashfunction");
    }
-   call NeighborDiscovery.displayNeighbors():
-   dbg(GENERAL_CHANNEL, "Neighbor discovered in the hashfunction");
+   
    event void CommandHandler.printRouteTable() {}
 
    event void CommandHandler.printLinkState() {}
