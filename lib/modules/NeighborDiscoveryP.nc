@@ -29,6 +29,19 @@ implementation {
         dbg(NEIGHBOR_CHANNEL, "Node %d: Starting Neighbor Discovery\n", TOS_NODE_ID);
         return SUCCESS;
     }
+        //  Clear all expired neighbors (TTL = 0)
+    command void NeighborDiscovery.clearExpiredNeighbors() {
+        uint32_t* neighbors = call NeighborCache.getKeys();
+        uint16_t i;
+        dbg(NEIGHBOR_CHANNEL, "Clearing expired neighbors\n");
+
+        for(i = 0; i < call NeighborCache.size(); i++) {
+            if (call NeighborCache.get(neighbors[i]) == 0) {
+                dbg(NEIGHBOR_CHANNEL, "Removing expired neighbor: %d\n", neighbors[i]);
+                call NeighborCache.remove(neighbors[i]);
+            }
+        }
+    }
 
     command void NeighborDiscovery.processDiscovery(pack* message) {
         dbg(NEIGHBOR_CHANNEL, "Processing Neighbor Discovery\n");
@@ -68,6 +81,17 @@ implementation {
         preparePacket(&MessageToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &dummyPayload, PACKET_MAX_PAYLOAD_SIZE);
         call Broadcast.send(MessageToSend, AM_BROADCAST_ADDR);
     }
+     // New function 2: Retrieve TTL for a specific neighbor
+    command uint16_t NeighborDiscovery.getNeighborTTL(uint32_t neighbor) {
+        if (call NeighborCache.contains(neighbor)) {
+            uint16_t ttl = call NeighborCache.get(neighbor);
+            dbg(NEIGHBOR_CHANNEL, "TTL for neighbor %d is %d\n", neighbor, ttl);
+            return ttl;
+        } else {
+            dbg(NEIGHBOR_CHANNEL, "Neighbor %d not found\n", neighbor);
+            return 0;
+        }
+    }
 
     command uint32_t* NeighborDiscovery.fetchNeighbors() {
         return call NeighborCache.getKeys();
@@ -95,35 +119,9 @@ implementation {
             }
         }
     }
-    //////////////////////////
 
-    // New function 1: Clear all expired neighbors (TTL = 0)
-    command void NeighborDiscovery.clearExpiredNeighbors() {
-        uint32_t* neighbors = call NeighborCache.getKeys();
-        uint16_t i;
-        dbg(NEIGHBOR_CHANNEL, "Clearing expired neighbors\n");
-
-        for(i = 0; i < call NeighborCache.size(); i++) {
-            if (call NeighborCache.get(neighbors[i]) == 0) {
-                dbg(NEIGHBOR_CHANNEL, "Removing expired neighbor: %d\n", neighbors[i]);
-                call NeighborCache.remove(neighbors[i]);
-            }
-        }
-    }
-
-    // New function 2: Retrieve TTL for a specific neighbor
-    command uint16_t NeighborDiscovery.getNeighborTTL(uint32_t neighbor) {
-        if (call NeighborCache.contains(neighbor)) {
-            uint16_t ttl = call NeighborCache.get(neighbor);
-            dbg(NEIGHBOR_CHANNEL, "TTL for neighbor %d is %d\n", neighbor, ttl);
-            return ttl;
-        } else {
-            dbg(NEIGHBOR_CHANNEL, "Neighbor %d not found\n", neighbor);
-            return 0;
-        }
-    }
+   
 }
-
 
 
 
