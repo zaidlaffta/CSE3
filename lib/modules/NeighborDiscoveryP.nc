@@ -38,14 +38,23 @@ implementation {
             message->src = TOS_NODE_ID;
             message->protocol = PROTOCOL_PINGREPLY;
             call Broadcast.send(*message, AM_BROADCAST_ADDR);
+            //handling ping reply
         } else if (message->protocol == PROTOCOL_PINGREPLY && message->dest == 0) {
             dbg(NEIGHBOR_CHANNEL, "PING REPLY received, confirmed neighbor %d\n", message->src);
+            /*/Insert or update neighbor in the neighborTable
             if (!call NeighborCache.contains(message->src)) {
                 call NeighborCache.insert(message->src, NODETIMETOLIVE);
-            }
+            }*/
+            // Insert or update neighbor in the NeighborTable
+            if (!call NeighborTable.contains(packet->src)) {
+                call NeighborTable.insert(packet->src, NODETIMETOLIVE); // New neighbor
+                dbg(NEIGHBOR_CHANNEL, "New neighbor discovered: %d\n", packet->src);
+            } else {
+                call NeighborTable.insert(packet->src, NODETIMETOLIVE); // Update TTL for existing neighbor
+                dbg(NEIGHBOR_CHANNEL, "Updated TTL for neighbor: %d\n", packet->src);
         }
     }
-
+    }
     event void Timer.fired() {
         uint32_t* neighbors = call NeighborCache.getKeys();
         uint8_t dummyPayload = 0;
