@@ -23,7 +23,7 @@ module Node {
 implementation {
    pack sendPackage;
    // make packet given in the lab
-   void preparePacket(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
+   void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
 
    event void Boot.booted() {
       call AMControl.start();
@@ -89,7 +89,7 @@ implementation {
    
    event void CommandHandler.ping(uint16_t destination, uint8_t *payload) {
       dbg(GENERAL_CHANNEL, "PING EVENT\n");
-      preparePacket(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
+      makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
       call Sender.send(sendPackage, destination);
       //Calling Flood protocol here
       dbg(GENERAL_CHANNEL, "Calling Flooding ping\n");
@@ -100,7 +100,7 @@ implementation {
       call NeighborDiscovery.displayNeighbors(); // Changed to displayNeighbors
       dbg(GENERAL_CHANNEL, "Command: Print Neighbors\n");
 
-
+      //disply neighbor disvoered in the hash function
       call NeighborDiscovery.displayNeighbors();
       dbg(GENERAL_CHANNEL, "Neighbor discovered in the hashfunction");
    }
@@ -119,7 +119,7 @@ implementation {
 
    event void CommandHandler.setAppClient() {}
 
-   void preparePacket(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
+   void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
       Package->src = src;
       Package->dest = dest;
       Package->TTL = TTL;

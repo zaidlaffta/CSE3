@@ -30,7 +30,7 @@ implementation {
     pack MessageToSend;
 
     // Helper function to prepare a packet with the specified parameters
-    void preparePacket(pack *pkt, uint16_t src, uint16_t dest, uint16_t ttl, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t len);
+    void makePack(pack *pkt, uint16_t src, uint16_t dest, uint16_t ttl, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t len);
 
     // Initializes the Neighbor Discovery process
     command error_t NeighborDiscovery.initialize() {
@@ -98,7 +98,7 @@ implementation {
         // Send a periodic PING broadcast to discover new neighbors
         dbg(NEIGHBOR_CHANNEL, "Sending periodic broadcast\n");
         dbg(GENERAL_CHANNEL, "Sending periodic broadcast\n");
-        preparePacket(&MessageToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &dummyPayload, PACKET_MAX_PAYLOAD_SIZE);
+        makePack(&MessageToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &dummyPayload, PACKET_MAX_PAYLOAD_SIZE);
         call Broadcast.send(MessageToSend, AM_BROADCAST_ADDR);
     }
 
@@ -127,7 +127,7 @@ implementation {
     }
 
     // Helper function to prepare a packet with the specified parameters
-    void preparePacket(pack *pkt, uint16_t src, uint16_t dest, uint16_t ttl, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t len) {
+    void makePack(pack *pkt, uint16_t src, uint16_t dest, uint16_t ttl, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t len) {
         dbg(NEIGHBOR_CHANNEL, "Preparing packet\n");
         pkt->src = src;
         pkt->dest = dest;
