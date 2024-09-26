@@ -153,7 +153,7 @@ event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len){
 #include "includes/sendInfo.h"
 #include "includes/channels.h"
 #include <string.h>
-
+/*
 module Node {
    //connecting flooding module 
    uses interface Flooding as Flooding;
@@ -269,4 +269,91 @@ implementation {
       Package->protocol = protocol;
       memcpy(Package->payload, payload, length);
    }
+}
+*/
+
+module Node {
+    uses interface Flooding as Flooding;
+    uses interface NeighborDiscovery as NeighborDiscovery;
+    uses interface Boot;
+    uses interface SplitControl as AMControl;
+    uses interface Receive;
+    uses interface SimpleSend as Sender;
+    uses interface CommandHandler;
+}
+
+implementation {
+    pack sendPackage;
+    int Neighbor_protocol = 0;
+    int FLOODING_Protocol = 0;
+
+    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t Protocol, uint16_t seq, uint8_t *payload, uint8_t length);
+
+    event void Boot.booted() {
+        call AMControl.start();
+        dbg(GENERAL_CHANNEL, "Booted\n");
+        call NeighborDiscovery.start();
+    }
+
+    event void AMControl.startDone(error_t err) {
+        if (err == SUCCESS) {
+            dbg(GENERAL_CHANNEL, "Radio On\n");
+        } else {
+            call AMControl.start();
+        }
+    }
+
+    event void AMControl.stopDone(error_t err) {
+        if (err != SUCCESS) {
+            dbg(GENERAL_CHANNEL, "Radio is not working \n");
+        } else {
+            call AMControl.start();
+        }
+    }
+
+    event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
+        if (len == sizeof(pack)) {
+            pack* myMsg = (pack*) payload;
+            if (strcmp((char*)(myMsg->payload), "NeighborProbing") && myMsg->protocol != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY) {
+                dbg(GENERAL_CHANNEL, "Packet Received\n");
+                dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
+            } else if (myMsg->dest == 0) {
+                dbg(GENERAL_CHANNEL, "Neighbor Discovery called\n");
+                call NeighborDiscovery.discover(myMsg);
+                Neighbor_protocol++;
+                dbg(GENERAL_CHANNEL, "Neighbor Discovery Called %d times\n", Neighbor_protocol);
+            } else {
+                dbg(GENERAL_CHANNEL, "Flooding function called\n");
+                call Flooding.Flood(myMsg);
+                FLOODING_Protocol++;
+                dbg(GENERAL_CHANNEL, "Flooding Protocol Executed %d times\n", FLOODING_Protocol);
+            }
+            return msg;
+        }
+
+        dbg(GENERAL_CHANNEL, "Unknown or corrupted packet type\n");
+        return msg;
+    }
+
+    event void CommandHandler.ping(uint16_t destination, uint8_t *payload) {
+        dbg(GENERAL_CHANNEL, "PING EVENT\n");
+        makePack(&sendPackage, TOS_NODE_ID, destination, 0, 0, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
+        call Sender.send(sendPackage, destination);
+        dbg(GENERAL_CHANNEL, "Calling Flooding ping\n");
+        call Flooding.ping(destination, payload);
+    }
+
+    event void CommandHandler.printNeighbors() {
+        call NeighborDiscovery.printNeighbors();
+        dbg(GENERAL_CHANNEL, "Command");
+    }
+
+    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
+        Package->src = src;
+        Package->dest = dest;
+        Package->TTL = TTL;
+        Package->seq = seq;
+        Package->protocol = protocol;
+        memcpy(Package->payload, payload, length);
+    }
 }

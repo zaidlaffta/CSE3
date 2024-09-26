@@ -9,6 +9,7 @@
 
 
 
+/*
 module NeighborDiscoveryP {
     provides interface NeighborDiscovery;
     uses interface Random as Random;
@@ -96,3 +97,108 @@ implementation {
     }
 
 }
+*/
+
+module NeighborDiscoveryP {
+    provides interface NeighborDiscovery;
+    uses interface Random as Random;
+    uses interface Timer<TMilli> as Timer;
+    uses interface Hashmap<uint32_t> as NeighborTable;
+    uses interface SimpleSend as Sender;
+}
+
+implementation {
+    pack MsgToSend;
+
+    // Packet constructor as given in the lab
+    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length);
+
+    command error_t NeighborDiscovery.start() {
+        call Timer.startPeriodic(500 + (uint16_t)(call Random.rand16() % 500));
+        dbg(NEIGHBOR_CHANNEL, "Node %d: Began Neighbor Discovery\n", TOS_NODE_ID);
+        return SUCCESS;
+    }
+
+    command void NeighborDiscovery.discover(pack* packet) {
+        dbg(NEIGHBOR_CHANNEL, "In NeighborDiscovery.discover\n");
+
+        // Handling PING messages
+        if (packet->TTL > 0 && packet->protocol == PROTOCOL_PING) {
+            dbg(NEIGHBOR_CHANNEL, "PING Neighbor Discovery\n");
+            packet->TTL = packet->TTL - 1;
+            packet->src = TOS_NODE_ID;
+            packet->protocol = PROTOCOL_PINGREPLY;
+            call Sender.send(*packet, AM_BROADCAST_ADDR);
+        }
+        // Handling PING REPLY messages
+        else if (packet->protocol == PROTOCOL_PINGREPLY && packet->dest == 0) {
+            dbg(NEIGHBOR_CHANNEL, "PING REPLY Neighbor Discovery, Confirmed neighbor %d\n", packet->src);
+
+            // Insert or update neighbor in the NeighborTable
+            if (!call NeighborTable.contains(packet->src)) {
+                call NeighborTable.insert(packet->src, NODETIMETOLIVE); // New neighbor
+                dbg(NEIGHBOR_CHANNEL, "New neighbor discovered: %d\n", packet->src);
+            } else {
+                call NeighborTable.insert(packet->src, NODETIMETOLIVE); // Update TTL for existing neighbor
+                dbg(NEIGHBOR_CHANNEL, "Updated TTL for neighbor: %d\n", packet->src);
+            }
+        }
+    }
+
+    event void Timer.fired() {
+        uint32_t* neighbors = call NeighborTable.getKeys();
+        uint16_t i;
+        dbg(NEIGHBOR_CHANNEL, "In Timer fired\n");
+
+        for (i = 0; i < call NeighborTable.size(); i++) {
+            if (neighbors[i] == 0) {
+                continue; // Skip invalid neighbors
+            }
+
+            uint16_t ttl = call NeighborTable.get(neighbors[i]);
+            if (ttl == 0) {
+                dbg(NEIGHBOR_CHANNEL, "Neighbor %d has expired. Removing...\n", neighbors[i]);
+                call NeighborTable.remove(neighbors[i]);
+            } else {
+                dbg(NEIGHBOR_CHANNEL, "Decreasing TTL for neighbor %d. TTL: %d\n", neighbors[i], ttl);
+                call NeighborTable.insert(neighbors[i], ttl - 1);
+            }
+        }
+
+        // Broadcast discovery packet
+        uint8_t payload = 0;
+        makePack(&MsgToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &payload, PACKET_MAX_PAYLOAD_SIZE);
+        call Sender.send(MsgToSend, AM_BROADCAST_ADDR);
+    }
+
+    command uint32_t* NeighborDiscovery.getNeighbors() {
+        return call NeighborTable.getKeys();
+    }
+
+    command uint16_t NeighborDiscovery.getNeighborListSize() {
+        return call NeighborTable.size();
+    }
+
+    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
+        dbg(NEIGHBOR_CHANNEL, "Making packet\n");
+        Package->src = src;
+        Package->dest = dest;
+        Package->TTL = TTL;
+        Package->seq = seq;
+        Package->protocol = protocol;
+        memcpy(Package->payload, payload, length);
+    }
+
+    command void NeighborDiscovery.printNeighbors() {
+        uint16_t i;
+        uint32_t* neighbors = call NeighborTable.getKeys();
+        dbg(NEIGHBOR_CHANNEL, "Printing Neighbors:\n");
+
+        for (i = 0; i < call NeighborTable.size(); i++) {
+            if (neighbors[i] != 0) {
+                dbg(NEIGHBOR_CHANNEL, "\tNeighbor: %d\n", neighbors[i]);
+            }
+        }
+    }
+}
+
