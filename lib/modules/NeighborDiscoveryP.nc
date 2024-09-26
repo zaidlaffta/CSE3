@@ -15,7 +15,7 @@ module NeighborDiscoveryP {
     // Uses the Random interface for generating random numbers
     uses interface Random as Random;
 
-    // Uses the Timer interface with millisecond precision for periodic tasks
+    // Uses the Timer interface with millisecond precision for periodic ping packet to be send
     uses interface Timer<TMilli> as Timer;
 
     // Uses the Hashmap interface to store and manage neighbors (neighbor cache)
@@ -34,9 +34,9 @@ implementation {
 
     // Initializes the Neighbor Discovery process
     command error_t NeighborDiscovery.initialize() {
-        // Start a periodic timer with a random interval between 500-1000ms
+        // Start a periodic timer with a random interval
         call Timer.startPeriodic(500 + (uint16_t)(call Random.rand16() % 500));
-        dbg(NEIGHBOR_CHANNEL, "Node %d: Starting Neighbor Discovery\n", TOS_NODE_ID);
+        dbg(GENERAL_CHANNEL, "Neighbor Discovery just Starte \n");
         return SUCCESS;
     }
 
