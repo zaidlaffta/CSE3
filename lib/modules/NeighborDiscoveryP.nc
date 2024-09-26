@@ -45,7 +45,6 @@ implementation {
         uint32_t* neighbors = call NeighborCache.getKeys();
         uint16_t i;
         dbg(NEIGHBOR_CHANNEL, "Clearing expired neighbors\n");
-
         // Iterate over the neighbors and remove those with TTL = 0
         for(i = 0; i < call NeighborCache.size(); i++) {
             if (call NeighborCache.get(neighbors[i]) == 0) {
@@ -61,6 +60,7 @@ implementation {
         // If the message is a PING and TTL > 0, decrement TTL and send PINGREPLY
         if(message->TTL > 0 && message->protocol == PROTOCOL_PING) {
             dbg(NEIGHBOR_CHANNEL, "PING received, updating message\n");
+            dbg(GENERAL_CHANNEL, "PING received, updating message\n");
             message->TTL--;
             message->src = TOS_NODE_ID;
             message->protocol = PROTOCOL_PINGREPLY;
@@ -82,13 +82,14 @@ implementation {
         uint8_t dummyPayload = 0;
         uint16_t i = 0;
         dbg(NEIGHBOR_CHANNEL, "Timer fired event\n");
-
+        dbg(GENERAL_CHANNEL, "Timer fired event\n");
         // Loop through neighbors and decrement their TTL or remove if expired
         for (i = 0; i < call NeighborCache.size(); i++) {
             if (neighbors[i] == 0) continue;
             if (call NeighborCache.get(neighbors[i]) == 0) {
                 dbg(NEIGHBOR_CHANNEL, "Neighbor %d expired, removing\n", neighbors[i]);
-                call NeighborCache.remove(neighbors[i]);
+                dbg(GENERAL_CHANNEL, "Neighbor %d expired, removing\n", neighbors[i]);
+                call NeighborDiscovery.clearExpiredNeighbors();
             } else {
                 call NeighborCache.insert(neighbors[i], call NeighborCache.get(neighbors[i]) - 1);
             }
