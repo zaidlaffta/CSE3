@@ -58,8 +58,6 @@ implementation {
     // Processes incoming discovery messages (PING/PINGREPLY)
     command void NeighborDiscovery.processDiscovery(pack* message) {
         dbg(GENERAL_CHANNEL, "Processing Neighbor Discovery \n");
-        dbg(NEIGHBOR_CHANNEL, "Zaid");
-
         // If the message is a PING and TTL > 0, decrement TTL and send PINGREPLY
         if(message->TTL > 0 && message->protocol == PROTOCOL_PING) {
             dbg(NEIGHBOR_CHANNEL, "PING received, updating message\n");
@@ -67,10 +65,10 @@ implementation {
             message->src = TOS_NODE_ID;
             message->protocol = PROTOCOL_PINGREPLY;
             call Broadcast.send(*message, AM_BROADCAST_ADDR);
-        
         // If a PINGREPLY is received and the destination is the node itself, confirm the neighbor
         } else if (message->protocol == PROTOCOL_PINGREPLY && message->dest == 0) {
-            dbg(NEIGHBOR_CHANNEL, "PING REPLY received, confirmed neighbor %d\n", message->src);
+            //dbg(NEIGHBOR_CHANNEL, "PING REPLY received, confirmed neighbor %d\n", message->src);
+            dbg(GENERAL_CHANNEL, "PING REPLY received, confirmed neighbor %d\n", message->src);
             // Add or update the neighbor in the NeighborCache with a fresh TTL
             if (!call NeighborCache.contains(message->src)) {
                 call NeighborCache.insert(message->src, NODETIMETOLIVE);
