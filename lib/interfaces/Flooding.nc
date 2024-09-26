@@ -1,5 +1,9 @@
 //CSE160
 //Project 1
+#include "../../includes/channels.h"
+#include "../../includes/packet.h"
+
+
 interface Flooding {
 	// Sends a ping message to the specified destination node.
 	command void ping(uint16_t destination, uint8_t *payload);

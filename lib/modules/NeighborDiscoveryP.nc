@@ -57,7 +57,6 @@ implementation {
 
     // Processes incoming discovery messages (PING/PINGREPLY)
     command void NeighborDiscovery.processDiscovery(pack* message) {
-        dbg(NEIGHBOR_CHANNEL, "Processing Neighbor Discovery\n");
         dbg(GENERAL_CHANNEL, "Processing Neighbor Discovery \n");
 
         // If the message is a PING and TTL > 0, decrement TTL and send PINGREPLY
