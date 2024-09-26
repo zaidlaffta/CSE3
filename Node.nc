@@ -100,8 +100,8 @@ implementation {
       call NeighborDiscovery.displayNeighbors(); // Changed to displayNeighbors
       dbg(GENERAL_CHANNEL, "Command: Print Neighbors\n");
 
-      
-      all NeighborDiscovery.displayNeighbors():
+
+      call NeighborDiscovery.displayNeighbors():
       dbg(GENERAL_CHANNEL, "Neighbor discovered in the hashfunction");
    }
    
