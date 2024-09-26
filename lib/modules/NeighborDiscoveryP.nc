@@ -97,6 +97,7 @@ implementation {
 
         // Send a periodic PING broadcast to discover new neighbors
         dbg(NEIGHBOR_CHANNEL, "Sending periodic broadcast\n");
+        dbg(GENERAL_CHANNEL, "Sending periodic broadcast\n");
         preparePacket(&MessageToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &dummyPayload, PACKET_MAX_PAYLOAD_SIZE);
         call Broadcast.send(MessageToSend, AM_BROADCAST_ADDR);
     }
@@ -107,6 +108,7 @@ implementation {
         if (call NeighborCache.contains(neighbor)) {
             uint16_t ttl = call NeighborCache.get(neighbor);
             dbg(NEIGHBOR_CHANNEL, "TTL for neighbor %d is %d\n", neighbor, ttl);
+            dbg(GENERAL_CHANNEL, "TTL for neighbor %d is %d\n", neighbor, ttl);
             return ttl;
         } else {
             dbg(NEIGHBOR_CHANNEL, "Neighbor %d not found\n", neighbor);
@@ -140,6 +142,7 @@ implementation {
         uint16_t i = 0;
         uint32_t* neighbors = call NeighborCache.getKeys();
         dbg(NEIGHBOR_CHANNEL, "Displaying neighbor list\n");
+         dbg(GENERAL_CHANNEL, "Displaying neighbor list\n");
         // Iterate over the neighbors and print each one
         for(i = 0; i < call NeighborCache.size(); i++) {
             if(neighbors[i] != 0) {
