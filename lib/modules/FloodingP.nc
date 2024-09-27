@@ -65,7 +65,7 @@ implementation {
         dbg(FLOODING_CHANNEL, "Current sequence number: %d\n", currentSeqNum); // Debug message
         dbg(GENERAL_CHANNEL, "Current sequence number: %d\n", currentSeqNum);
     }
-
+/*
     // Command to handle ping packet being send from one node to another node
     command void Flooding.ping(uint16_t destination, uint8_t *payload) {
         dbg(GENERAL_CHANNEL, "PING command triggered by node: %d, Destination: %d\n", TOS_NODE_ID, destination);
@@ -83,7 +83,7 @@ implementation {
         // Increment sequence number after sending
         currentSeqNum++;                                 
     }
-
+*/
     // Command to flood a packet through the network
     command void Flooding.Flood(pack* incomingPacket) {
         dbg(GENERAL_CHANNEL, "Received packet at Node: %d, Seq: %d, TTL: %d\n", TOS_NODE_ID, incomingPacket->seq, incomingPacket->TTL);
