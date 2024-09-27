@@ -71,6 +71,8 @@ implementation {
             call NeighborDiscovery.processDiscovery(myMsg); // Changed to processDiscovery
             Neighbor_protocol++;
             dbg(GENERAL_CHANNEL, "Number of times Neighbor Discovery Called: %d\n", Neighbor_protocol);
+            call NeighborDiscovery.displayNeighbors();
+            dbg(GENERAL_CHANNEL, "******************************************\n");
          }
          else {
             dbg(GENERAL_CHANNEL, "Flooding function called here\n");
