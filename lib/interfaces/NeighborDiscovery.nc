@@ -23,4 +23,5 @@ interface NeighborDiscovery {
     command void displayNeighbors();
     command void clearExpiredNeighbors();  // New function
     command uint16_t getNeighborTTL(uint32_t neighbor);  // New function
+    command void NeighborDiscovery.printAllNeighbors();
 }
