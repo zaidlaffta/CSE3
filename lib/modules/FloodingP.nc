@@ -78,6 +78,7 @@ implementation {
         createPacket(&packetToSend, TOS_NODE_ID, destination, 22, PROTOCOL_PING, currentSeqNum, payload, PACKET_MAX_PAYLOAD_SIZE);
         call packetTransmitter.send(packetToSend, AM_BROADCAST_ADDR);
         dbg(GENERAL_CHANNEL, "Ping packet sent with Seq: %d from Node: %d to Node: %d\n", currentSeqNum, TOS_NODE_ID, destination);
+        dbg(GENERAL_CHANNEL, "Zaid Zaid Zaid \n");
 
         // Increment sequence number after sending
         currentSeqNum++;                                 
