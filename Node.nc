@@ -72,8 +72,6 @@ implementation {
             //dbg(GENERAL_CHANNEL, "Number of times Neighbor Discovery Called: %d\n", Neighbor_protocol);
             call NeighborDiscovery.displayNeighbors();
             dbg(GENERAL_CHANNEL, "******************************************\n");
-            dbg(GENERAL_CHANNEL, "###################this is all neigbhor list#################### \n");
-            call NeighborDiscovery.printAllNeighbors();
          }
          else {
             //dbg(GENERAL_CHANNEL, "Flooding function called here\n");
