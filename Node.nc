@@ -100,7 +100,8 @@ implementation {
    event void CommandHandler.printNeighbors() {  
       call NeighborDiscovery.displayNeighbors(); 
       dbg(GENERAL_CHANNEL, "Command: Print Neighbors\n");
-
+      dbg(GENERAL_CHANNEL, "###################this is all neigbhor list#################### \n");
+      NeighborDiscovery.printAllNeighbors()
       //disply neighbor disvoered in the hash function
       call NeighborDiscovery.displayNeighbors();
       dbg(GENERAL_CHANNEL, "******************************************\n");
