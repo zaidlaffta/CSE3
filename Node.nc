@@ -67,15 +67,15 @@ implementation {
             dbg(GENERAL_CHANNEL, "%d\n", myMsg->protocol);
          }
          else if (myMsg->dest == 0) {
-            dbg(GENERAL_CHANNEL, "Neighbor Discovery called here\n");
+            //dbg(GENERAL_CHANNEL, "Neighbor Discovery called here\n");
             call NeighborDiscovery.processDiscovery(myMsg); // Changed to processDiscovery
             Neighbor_protocol++;
             dbg(GENERAL_CHANNEL, "Number of times Neighbor Discovery Called: %d\n", Neighbor_protocol);
             call NeighborDiscovery.displayNeighbors();
-            dbg(GENERAL_CHANNEL, "******************************************\n");
+            //dbg(GENERAL_CHANNEL, "******************************************\n");
          }
          else {
-            dbg(GENERAL_CHANNEL, "Flooding function called here\n");
+            //dbg(GENERAL_CHANNEL, "Flooding function called here\n");
             call Flooding.Flood(myMsg);
             FLOODING_Protocol++;
             dbg(GENERAL_CHANNEL, "Number of times Flooding Protocol Executed: %d\n", FLOODING_Protocol);
@@ -99,7 +99,7 @@ implementation {
    }
 
    event void CommandHandler.printNeighbors() {  
-      call NeighborDiscovery.displayNeighbors(); // Changed to displayNeighbors
+      call NeighborDiscovery.displayNeighbors(); 
       dbg(GENERAL_CHANNEL, "Command: Print Neighbors\n");
 
       //disply neighbor disvoered in the hash function

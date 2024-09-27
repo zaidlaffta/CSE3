@@ -30,10 +30,10 @@ implementation {
         if (call PreviousPackets.contains(key)) {        // Check if the key exists
             if (call PreviousPackets.get(key) == val) {  // Verify the value associated with the key
                  dbg(GENERAL_CHANNEL, "Packet already forwarded, skipping flood\n");
-                return TRUE;                             // Return true if both match
+                return TRUE;                             
             }
         }
-        return FALSE;                                    // Otherwise, return false
+        return FALSE;                                    
     }
 
     // Function to create a packet based on input parameters
