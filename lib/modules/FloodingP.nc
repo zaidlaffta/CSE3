@@ -121,7 +121,7 @@ implementation {
             call packetTransmitter.send(*incomingPacket, AM_BROADCAST_ADDR);
             totalFloodedPackets++;                       
             dbg(FLOODING_CHANNEL, "Forwarding packet from Node: %d, New TTL: %d, Total Flooded: %d\n", 
-
+                TOS_NODE_ID, incomingPacket->TTL, totalFloodedPackets);
 
             // Print debug messages for tracking
             dbg(GENERAL_CHANNEL, "Total flooded packets: %d\n", totalFloodedPackets);
