@@ -148,7 +148,7 @@ implementation {
         // Iterate over the neighbors and print each one
         for(i = 0; i < call NeighborCache.size(); i++) {
             if(neighbors[i] != 0) {
-                dbg(NEIGHBOR_CHANNEL, "\tNeighbor: %d\n", neighbors[i]);
+                dbg(GENERAL_CHANNEL, "\tNeighbor: %d\n", neighbors[i]);
             }
         }
     }
