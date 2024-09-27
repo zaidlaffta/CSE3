@@ -67,8 +67,7 @@ implementation {
             call Broadcast.send(*message, AM_BROADCAST_ADDR);
         // If a PINGREPLY is received and the destination is the node itself, confirm the neighbor
         } else if (message->protocol == PROTOCOL_PINGREPLY && message->dest == 0) {
-            //dbg(NEIGHBOR_CHANNEL, "PING REPLY received, confirmed neighbor %d\n", message->src);
-            dbg(GENERAL_CHANNEL, "PING REPLY received, confirmed neighbor %d\n", message->src);
+            dbg(GENERAL_CHANNEL, "Ping reply got received, confirmed neighbor %d\n", message->src);
             // Add or update the neighbor in the NeighborCache with a fresh TTL
             if (!call NeighborCache.contains(message->src)) {
                 call NeighborCache.insert(message->src, NODETIMETOLIVE);
@@ -81,22 +80,18 @@ implementation {
         uint32_t* neighbors = call NeighborCache.getKeys();
         uint8_t dummyPayload = 0;
         uint16_t i = 0;
-        dbg(NEIGHBOR_CHANNEL, "Timer fired event\n");
         dbg(GENERAL_CHANNEL, "Timer fired event\n");
         // Loop through neighbors and decrement their TTL or remove if expired
         for (i = 0; i < call NeighborCache.size(); i++) {
             if (neighbors[i] == 0) continue;
             if (call NeighborCache.get(neighbors[i]) == 0) {
-                dbg(NEIGHBOR_CHANNEL, "Neighbor %d expired, removing\n", neighbors[i]);
                 dbg(GENERAL_CHANNEL, "Neighbor %d expired, removing\n", neighbors[i]);
                 call NeighborDiscovery.clearExpiredNeighbors();
             } else {
                 call NeighborCache.insert(neighbors[i], call NeighborCache.get(neighbors[i]) - 1);
             }
         }
-
         // Send a periodic PING broadcast to discover new neighbors
-        dbg(NEIGHBOR_CHANNEL, "Sending periodic broadcast\n");
         dbg(GENERAL_CHANNEL, "Sending periodic broadcast\n");
         makePack(&MessageToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &dummyPayload, PACKET_MAX_PAYLOAD_SIZE);
         call Broadcast.send(MessageToSend, AM_BROADCAST_ADDR);
@@ -107,7 +102,6 @@ implementation {
         // Check if the neighbor exists in the cache
         if (call NeighborCache.contains(neighbor)) {
             uint16_t ttl = call NeighborCache.get(neighbor);
-            dbg(NEIGHBOR_CHANNEL, "TTL for neighbor %d is %d\n", neighbor, ttl);
             dbg(GENERAL_CHANNEL, "TTL for neighbor %d is %d\n", neighbor, ttl);
             return ttl;
         } else {
@@ -136,8 +130,23 @@ implementation {
         pkt->protocol = protocol;
         memcpy(pkt->payload, payload, len);
     } 
+///////////////////////////
+    command void NeighborDiscovery.printAllNeighbors() {
+    uint32_t* neighbors = call NeighborCache.getKeys();
+    uint16_t i;
 
-    
+    dbg(NEIGHBOR_CHANNEL, "Listing all nodes with their neighbors:\n");
+    dbg(GENERAL_CHANNEL, "Listing all nodes with their neighbors:\n");
+
+    for(i = 0; i < call NeighborCache.size(); i++) {
+        // Print the neighbor information
+        if(neighbors[i] != 0) {
+            uint16_t ttl = call NeighborCache.get(neighbors[i]);
+            dbg(GENERAL_CHANNEL, "Node: %d has Neighbor: %d with TTL: %d\n", TOS_NODE_ID, neighbors[i], ttl);
+        }
+    }
+}
+/////////////////////
 
     // Display the list of neighbors stored in the NeighborCache
     command void NeighborDiscovery.displayNeighbors() {
