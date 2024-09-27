@@ -65,7 +65,7 @@ implementation {
         dbg(FLOODING_CHANNEL, "Current sequence number: %d\n", currentSeqNum); // Debug message
         dbg(GENERAL_CHANNEL, "Current sequence number: %d\n", currentSeqNum);
     }
-/*
+
     // Command to handle ping packet being send from one node to another node
     command void Flooding.ping(uint16_t destination, uint8_t *payload) {
         dbg(GENERAL_CHANNEL, "PING command triggered by node: %d, Destination: %d\n", TOS_NODE_ID, destination);
@@ -77,13 +77,13 @@ implementation {
         // Create a new packet with specific parameters and send it
         createPacket(&packetToSend, TOS_NODE_ID, destination, 22, PROTOCOL_PING, currentSeqNum, payload, PACKET_MAX_PAYLOAD_SIZE);
         call packetTransmitter.send(packetToSend, AM_BROADCAST_ADDR);
-        dbg(GENERAL_CHANNEL, "Ping packet sent with Seq: %d from Node: %d to Node: %d\n", currentSeqNum, TOS_NODE_ID, destination);
-        dbg(GENERAL_CHANNEL, "Zaid Zaid Zaid \n");
+        //dbg(GENERAL_CHANNEL, "Ping packet sent with Seq: %d from Node: %d to Node: %d\n", currentSeqNum, TOS_NODE_ID, destination);
+        
 
         // Increment sequence number after sending
         currentSeqNum++;                                 
     }
-*/
+
     // Command to flood a packet through the network
     command void Flooding.Flood(pack* incomingPacket) {
         dbg(GENERAL_CHANNEL, "Received packet at Node: %d, Seq: %d, TTL: %d\n", TOS_NODE_ID, incomingPacket->seq, incomingPacket->TTL);
