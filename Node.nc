@@ -62,7 +62,6 @@ implementation {
          // Don't print messages from neighbor probe packets or DV packets
          if (strcmp((char*)(myMsg->payload), "NeighborProbing") && myMsg->protocol != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY) {
             dbg(GENERAL_CHANNEL, "Packet Received\n");
-
             dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
             dbg(GENERAL_CHANNEL, "%d\n", myMsg->protocol);
          }
@@ -70,15 +69,15 @@ implementation {
             //dbg(GENERAL_CHANNEL, "Neighbor Discovery called here\n");
             call NeighborDiscovery.processDiscovery(myMsg); // Changed to processDiscovery
             Neighbor_protocol++;
-            dbg(GENERAL_CHANNEL, "Number of times Neighbor Discovery Called: %d\n", Neighbor_protocol);
+            //dbg(GENERAL_CHANNEL, "Number of times Neighbor Discovery Called: %d\n", Neighbor_protocol);
             call NeighborDiscovery.displayNeighbors();
-            //dbg(GENERAL_CHANNEL, "******************************************\n");
+            dbg(GENERAL_CHANNEL, "******************************************\n");
          }
          else {
             //dbg(GENERAL_CHANNEL, "Flooding function called here\n");
             call Flooding.Flood(myMsg);
             FLOODING_Protocol++;
-            dbg(GENERAL_CHANNEL, "Number of times Flooding Protocol Executed: %d\n", FLOODING_Protocol);
+            //dbg(GENERAL_CHANNEL, "Number of times Flooding Protocol Executed: %d\n", FLOODING_Protocol);
          }
          return msg;
       }
