@@ -102,6 +102,7 @@ implementation {
 
       //disply neighbor disvoered in the hash function
       call NeighborDiscovery.displayNeighbors();
+      dbg(GENERAL_CHANNEL, "******************************************\n");
       dbg(GENERAL_CHANNEL, "Neighbor discovered in the hashfunction");
    }
    

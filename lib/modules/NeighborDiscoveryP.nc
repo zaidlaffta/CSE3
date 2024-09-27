@@ -137,6 +137,8 @@ implementation {
         memcpy(pkt->payload, payload, len);
     } 
 
+    
+
     // Display the list of neighbors stored in the NeighborCache
     command void NeighborDiscovery.displayNeighbors() {
         uint16_t i = 0;
