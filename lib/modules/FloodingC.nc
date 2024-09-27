@@ -21,8 +21,6 @@ implementation {
 	components new HashmapC(uint32_t, 25);
 	//Instantiate a Map component (with key as uint32_t) to track received packets.
 	components new SimpleSendC(AM_PACK);
-	
-    
 	//Wiring for Flooding
     //used as a packet identifyer - mentioned in the Lab by Jothi
 	FloodingP.PreviousPackets -> HashmapC;

@@ -23,12 +23,13 @@ implementation {
     
     uint16_t totalFloodedPackets = 0;       // Counter for tracking flooded packets
     uint16_t currentSeqNum = 0;             // Sequence number for packet identification
-    pack packetToSend;                      // Renamed for better clarity
+    pack packetToSend;                     
 
     // Function to check if a key-value pair exists in the PreviousPackets hashmap
     bool isPacketPreviouslySent(uint32_t key, uint32_t val) {
         if (call PreviousPackets.contains(key)) {        // Check if the key exists
             if (call PreviousPackets.get(key) == val) {  // Verify the value associated with the key
+                 dbg(GENERAL_CHANNEL, "Packet already forwarded, skipping flood\n");
                 return TRUE;                             // Return true if both match
             }
         }
@@ -43,7 +44,9 @@ implementation {
         packet->TTL = ttl;                               
         packet->seq = seq;                              
         packet->protocol = protocol;                   
-        memcpy(packet->payload, payload, length);        
+        memcpy(packet->payload, payload, length);    
+        dbg(GENERAL_CHANNEL, "Created packet - Src: %d, Dest: %d, TTL: %d, Seq: %d, Protocol: %d\n", 
+            src, dest, ttl, seq, protocol);    
     }
 
     // Function to get the total number of flooded packets
@@ -53,65 +56,76 @@ implementation {
 
     //Reset the total flooded packets counter
     void resetFloodedPacketCounter() {
-        totalFloodedPackets = 0;                         // Reset the counter to 0
-        dbg(FLOODING_CHANNEL, "Flooded packet counter reset to 0\n");  // Debug message
+        totalFloodedPackets = 0;                     
+        dbg(FLOODING_CHANNEL, "Flooded packet counter reset to 0 \n");  
     }
 
     // Log the current sequence number for debugging
     void printCurrentSeqNum() {
         dbg(FLOODING_CHANNEL, "Current sequence number: %d\n", currentSeqNum); // Debug message
+        dbg(GENERAL_CHANNEL, "Current sequence number: %d\n", currentSeqNum);
     }
 
-    // Command to handle the ping event
+    // Command to handle ping packet being send from one node to another node
     command void Flooding.ping(uint16_t destination, uint8_t *payload) {
+        dbg(GENERAL_CHANNEL, "PING command triggered by node: %d, Destination: %d\n", TOS_NODE_ID, destination);
+
         // Debugging information to show event details
-        dbg(FLOODING_CHANNEL, "PING event triggered\n");
-        dbg(FLOODING_CHANNEL, "Sender Node: %d\n", TOS_NODE_ID);
-        dbg(FLOODING_CHANNEL, "Destination Node: %d\n", destination);
+        //dbg(GENERAL_CHANNEL, "PING event triggered\n");
+        //dbg(GENERAL_CHANNEL, "Sender Node: %d\n", TOS_NODE_ID);
+        //dbg(GENERAL_CHANNEL, "Destination Node: %d\n", destination);
         // Create a new packet with specific parameters and send it
         createPacket(&packetToSend, TOS_NODE_ID, destination, 22, PROTOCOL_PING, currentSeqNum, payload, PACKET_MAX_PAYLOAD_SIZE);
         call packetTransmitter.send(packetToSend, AM_BROADCAST_ADDR);
+        dbg(GENERAL_CHANNEL, "Ping packet sent with Seq: %d from Node: %d to Node: %d\n", currentSeqNum, TOS_NODE_ID, destination);
+
         // Increment sequence number after sending
         currentSeqNum++;                                 
     }
 
     // Command to flood a packet through the network
     command void Flooding.Flood(pack* incomingPacket) {
+        dbg(GENERAL_CHANNEL, "Received packet at Node: %d, Seq: %d, TTL: %d\n", TOS_NODE_ID, incomingPacket->seq, incomingPacket->TTL);
+
         // Check if the packet was already forwarded previously
         if (isPacketPreviouslySent(incomingPacket->seq, incomingPacket->src)) {
-            dbg(FLOODING_CHANNEL, "Duplicate packet detected, not forwarding\n");
+            dbg(GENERAL_CHANNEL, "Duplicate packet detected at Node: %d, not forwarding\n", TOS_NODE_ID);
         } 
         // If TTL (Time to Live) is 0, the packet should not be forwarded
         else if (incomingPacket->TTL == 0) {
-            dbg(FLOODING_CHANNEL, "Packet TTL expired, not forwarding \n");
+            dbg(GENERAL_CHANNEL, "Packet TTL expired at Node: %d, not forwarding\n", TOS_NODE_ID);
         } 
         // If the packet has reached its destination
         else if (incomingPacket->dest == TOS_NODE_ID) {
+        dbg(FLOODING_CHANNEL, "Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
+
             // Handle ping protocol
             if (incomingPacket->protocol == PROTOCOL_PING) {
-                dbg(FLOODING_CHANNEL, "Packet reached destination\n");
+               dbg(GENERAL_CHANNEL, "Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
                 call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
                 // Create a reply packet and send it back
                 createPacket(&packetToSend, incomingPacket->dest, incomingPacket->src, 10, PROTOCOL_PINGREPLY, currentSeqNum++, (uint8_t *) incomingPacket->payload, PACKET_MAX_PAYLOAD_SIZE);
                 call packetTransmitter.send(packetToSend, AM_BROADCAST_ADDR);
-                dbg(FLOODING_CHANNEL, "Reply packet sent\n");
+                dbg(GENERAL_CHANNEL, "PingReply packet sent from Node: %d to Node: %d\n", TOS_NODE_ID, incomingPacket->src);
             } 
             // Handle ping reply protocol
             else if (incomingPacket->protocol == PROTOCOL_PINGREPLY) {
-                dbg(FLOODING_CHANNEL, "Ping reply received at destination\n");
+                dbg(GENERAL_CHANNEL, "PingReply received at destination Node: %d\n", TOS_NODE_ID);
                 call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
             }
         } 
         // Otherwise, forward the packet to the next node
         else {
-            incomingPacket->TTL--;                       // Decrease TTL to avoid infinite forwarding
+            incomingPacket->TTL--;                      
             call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
             call packetTransmitter.send(*incomingPacket, AM_BROADCAST_ADDR);
-            totalFloodedPackets++;                       // Increment the flooded packet count
+            totalFloodedPackets++;                       
+            dbg(FLOODING_CHANNEL, "Forwarding packet from Node: %d, New TTL: %d, Total Flooded: %d\n", 
+
 
             // Print debug messages for tracking
-            dbg(FLOODING_CHANNEL, "Total flooded packets: %d\n", totalFloodedPackets);
-            dbg(FLOODING_CHANNEL, "Packet forwarded with reduced TTL\n");
+            dbg(GENERAL_CHANNEL, "Total flooded packets: %d\n", totalFloodedPackets);
+            dbg(GENERAL_CHANNEL, "Packet forwarded with reduced TTL\n");
         }
     }
 }
