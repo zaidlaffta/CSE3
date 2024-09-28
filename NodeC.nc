@@ -11,6 +11,8 @@
 #include "includes/channels.h"
 #include <string.h>
 
+
+/*
 configuration NodeC{
 }
 implementation {
@@ -37,4 +39,34 @@ implementation {
 
 
 
+}
+*/
+configuration NodeC {
+}
+implementation {
+    components MainC;
+    components Node;
+    components new AMReceiverC(AM_PACK) as GeneralReceive;
+
+    Node -> MainC.Boot;
+    Node.Receive -> GeneralReceive;
+    
+    components ActiveMessageC;
+    Node.AMControl -> ActiveMessageC;
+
+    components new SimpleSendC(AM_PACK);
+    Node.Sender -> SimpleSendC;
+
+    components CommandHandlerC;
+    Node.CommandHandler -> CommandHandlerC;
+
+    components FloodingC;
+    Node.Flooding -> FloodingC;
+
+    components NeighborDiscoveryC;
+    Node.NeighborDiscovery -> NeighborDiscoveryC;
+
+    // Add TimerMilliC component to handle millisecond timer
+    components TimerMilliC;
+    Node.Timer0 -> TimerMilliC;  // Connect Timer0 to TimerMilliC
 }
