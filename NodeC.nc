@@ -32,6 +32,9 @@ implementation {
     // Adding neighbor discovery as component
     components NeighborDiscoveryC;
     Node.NeighborDiscovery -> NeighborDiscoveryC;
+    components TimerMilliC;
+    Node.Timer0 -> TimerMilliC;
+
 
 
 }
