@@ -36,10 +36,8 @@ implementation {
    event void Boot.booted() {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
-
-
       // Start a timer to fire after 3 seconds
-      call Timer0.startOneShot(3000);  // 3000 milliseconds = 3 seconds
+      call Timer0.startOneShot(30);  // 3000 milliseconds = 3 seconds
    }
 
    event void AMControl.startDone(error_t err) {
