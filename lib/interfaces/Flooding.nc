@@ -1,5 +1,8 @@
-//CSE160
-//Project 1
+// Project 1
+// CSE 160
+// Sep/28/2024
+// Zaid Laffta
+
 #include "../../includes/channels.h"
 #include "../../includes/packet.h"
 

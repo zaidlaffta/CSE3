@@ -1,5 +1,7 @@
-//CSE160
-//Project 1
+// Project 1
+// CSE 160
+// Sep/28/2024
+// Zaid Laffta
 
 #include "../../includes/channels.h"
 #include "../../includes/CommandMsg.h"
@@ -69,18 +71,8 @@ implementation {
     // Command to handle ping packet being send from one node to another node
     command void Flooding.ping(uint16_t destination, uint8_t *payload) {
         dbg(GENERAL_CHANNEL, "PING command triggered by node: %d, Destination: %d\n", TOS_NODE_ID, destination);
-
-        // Debugging information to show event details
-        //dbg(GENERAL_CHANNEL, "PING event triggered\n");
-        //dbg(GENERAL_CHANNEL, "Sender Node: %d\n", TOS_NODE_ID);
-        //dbg(GENERAL_CHANNEL, "Destination Node: %d\n", destination);
-        // Create a new packet with specific parameters and send it
         createPacket(&packetToSend, TOS_NODE_ID, destination, 22, PROTOCOL_PING, currentSeqNum, payload, PACKET_MAX_PAYLOAD_SIZE);
         call packetTransmitter.send(packetToSend, AM_BROADCAST_ADDR);
-        //dbg(GENERAL_CHANNEL, "Ping packet sent with Seq: %d from Node: %d to Node: %d\n", currentSeqNum, TOS_NODE_ID, destination);
-        
-
-        // Increment sequence number after sending
         currentSeqNum++;                                 
     }
 
@@ -123,7 +115,6 @@ implementation {
             totalFloodedPackets++;                       
             dbg(FLOODING_CHANNEL, "Forwarding packet from Node: %d, New TTL: %d, Total Flooded: %d\n", 
                 TOS_NODE_ID, incomingPacket->TTL, totalFloodedPackets);
-
             // Print debug messages for tracking
             dbg(GENERAL_CHANNEL, "Total flooded packets: %d\n", totalFloodedPackets);
             dbg(GENERAL_CHANNEL, "Packet forwarded with reduced TTL\n");

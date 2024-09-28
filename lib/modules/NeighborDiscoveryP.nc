@@ -1,3 +1,8 @@
+// Project 1
+// CSE 160
+// Sep/28/2024
+// Zaid Laffta
+
 #include <Timer.h>
 #include "../../includes/channels.h"
 #include "../../includes/packet.h"
@@ -11,16 +16,12 @@
 module NeighborDiscoveryP {
     // Provides the NeighborDiscovery interface to other modules
     provides interface NeighborDiscovery;
-    
     // Uses the Random interface for generating random numbers
     uses interface Random as Random;
-
     // Uses the Timer interface with millisecond precision for periodic ping packet to be send
     uses interface Timer<TMilli> as Timer;
-
     // Uses the Hashmap interface to store and manage neighbors (neighbor cache)
     uses interface Hashmap<uint32_t> as NeighborCache;
-
     // Uses the SimpleSend interface for sending broadcast messages
     uses interface SimpleSend as Broadcast;
 }
@@ -28,7 +29,6 @@ module NeighborDiscoveryP {
 implementation {
     // Packet structure for sending messages
     pack MessageToSend;
-
     // Helper function to prepare a packet with the specified parameters
     void makePack(pack *pkt, uint16_t src, uint16_t dest, uint16_t ttl, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t len);
 
@@ -130,24 +130,6 @@ implementation {
         pkt->protocol = protocol;
         memcpy(pkt->payload, payload, len);
     } 
-///////////////////////////
-    command void NeighborDiscovery.printAllNeighbors() {
-    uint32_t* neighbors = call NeighborCache.getKeys();
-    uint16_t i;
-
-    dbg(NEIGHBOR_CHANNEL, "Listing all nodes with their neighbors:\n");
-    dbg(GENERAL_CHANNEL, "Listing all nodes with their neighbors:\n");
-
-    for(i = 0; i < call NeighborCache.size(); i++) {
-        // Print the neighbor information
-        if(neighbors[i] != 0) {
-            uint16_t ttl = call NeighborCache.get(neighbors[i]);
-            dbg(GENERAL_CHANNEL, "Node: %d has Neighbor: %d with TTL: %d\n", TOS_NODE_ID, neighbors[i], ttl);
-        }
-    }
-}
-/////////////////////
-
     // Display the list of neighbors stored in the NeighborCache
     command void NeighborDiscovery.displayNeighbors() {
         uint16_t i = 0;

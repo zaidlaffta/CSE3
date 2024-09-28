@@ -1,11 +1,7 @@
-/**
- * ANDES Lab - University of California, Merced
- * This class provides the basic functions of a network node.
- *
- * @author UCM ANDES Lab
- * @date   2013/09/03
- *
- */
+// Project 1
+// CSE 160
+// Sep/28/2024
+// Zaid Laffta
 
 #include <Timer.h>
 #include "includes/command.h"
@@ -23,19 +19,13 @@ implementation {
     components new AMReceiverC(AM_PACK) as GeneralReceive;
 
     Node -> MainC.Boot;
-
     Node.Receive -> GeneralReceive;
-
     components ActiveMessageC;
     Node.AMControl -> ActiveMessageC;
-
     components new SimpleSendC(AM_PACK);
-
     Node.Sender -> SimpleSendC;
-
     components CommandHandlerC;
     Node.CommandHandler -> CommandHandlerC;
-
     // add components for FloodingC
      components FloodingC;
     Node.Flooding -> FloodingC;
