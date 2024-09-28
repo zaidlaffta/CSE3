@@ -140,12 +140,12 @@ def main():
 
     #Change runtime
     s.runTime(1);
-    s.ping(1, 2, "Hello, World");
+    #s.ping(1, 2, "Hello, World");
     #Change runtime
-    s.runTime(1);
-    s.ping(1, 3, "Hi!");
+    #s.runTime(1);
+    #s.ping(1, 3, "Hi!");
     #change runtime
-    s.runTime(1);
+    #s.runTime(1);
 
 if __name__ == '__main__':
     main()
