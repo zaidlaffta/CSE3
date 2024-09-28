@@ -17,7 +17,6 @@ implementation {
     components MainC;
     components Node;
     components new AMReceiverC(AM_PACK) as GeneralReceive;
-    components TimerMilliC;
 
 
     Node -> MainC.Boot;
@@ -34,8 +33,7 @@ implementation {
     // Adding neighbor discovery as component
     components NeighborDiscoveryC;
     Node.NeighborDiscovery -> NeighborDiscoveryC;
-    components TimerMilliC;
-    Node.Timer0 -> TimerMilliC;
+   
 
 
 

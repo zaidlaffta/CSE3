@@ -13,8 +13,6 @@
 
 module Node {
 
-   ////////////////////////////
-   uses interface Timer<TMilli> as Timer0;
    //connecting flooding module 
    uses interface Flooding as Flooding;
    //connecting neighbor discovery module
@@ -35,8 +33,7 @@ implementation {
    event void Boot.booted() {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
-      //////////////////////
-      call Timer0.startOneShot(3000);  // 3 seconds (3000 milliseconds)
+
 
    }
 
@@ -51,13 +48,7 @@ implementation {
       }
    }
 
-//////////////
-event void Timer0.fired() {
-   dbg(GENERAL_CHANNEL, "Program finished after 3 seconds\n");
-   // If you want to stop the radio or perform any cleanup:
-   call AMControl.stop();
-   // Or you could signal completion here
-}
+
 
 
    event void AMControl.stopDone(error_t err) {
