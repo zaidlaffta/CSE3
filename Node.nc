@@ -11,7 +11,6 @@
 #include "includes/channels.h"
 #include <string.h>
 
-
 module Node {
 
    //connecting flooding module 
@@ -24,7 +23,6 @@ module Node {
    uses interface Receive;
    uses interface SimpleSend as Sender;
    uses interface CommandHandler;
-
 }
 
 implementation {
@@ -35,7 +33,8 @@ implementation {
    event void Boot.booted() {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
-      // Start a timer to fire after 3 seconds
+
+
    }
 
    event void AMControl.startDone(error_t err) {
@@ -48,6 +47,7 @@ implementation {
          call AMControl.start();
       }
    }
+
 
 
 
@@ -137,6 +137,3 @@ implementation {
       memcpy(Package->payload, payload, length);
    }
 }
-
-
-
