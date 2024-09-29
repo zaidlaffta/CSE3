@@ -24,7 +24,6 @@ module Node {
    uses interface Receive;
    uses interface SimpleSend as Sender;
    uses interface CommandHandler;
-   uses interface Timer<TMilli> as Timer0;  // <-- Declare the Timer interface
 
 }
 
@@ -37,7 +36,6 @@ implementation {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
       // Start a timer to fire after 3 seconds
-      //call Timer0.startOneShot(30); 
    }
 
    event void AMControl.startDone(error_t err) {
