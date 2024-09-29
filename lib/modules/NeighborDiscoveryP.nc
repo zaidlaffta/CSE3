@@ -44,7 +44,6 @@ implementation {
     command void NeighborDiscovery.clearExpiredNeighbors() {
         uint32_t* neighbors = call NeighborCache.getKeys();
         uint16_t i;
-        dbg(NEIGHBOR_CHANNEL, "Clearing expired neighbors\n");
         // Iterate over the neighbors and remove those with TTL = 0
         for(i = 0; i < call NeighborCache.size(); i++) {
             if (call NeighborCache.get(neighbors[i]) == 0) {
@@ -59,7 +58,6 @@ implementation {
         dbg(GENERAL_CHANNEL, "Processing Neighbor Discovery \n");
         // If the message is a PING and TTL > 0, decrement TTL and send PINGREPLY
         if(message->TTL > 0 && message->protocol == PROTOCOL_PING) {
-            dbg(NEIGHBOR_CHANNEL, "PING received, updating message\n");
             dbg(GENERAL_CHANNEL, "PING received, updating message\n");
             message->TTL--;
             message->src = TOS_NODE_ID;
@@ -80,7 +78,7 @@ implementation {
         uint32_t* neighbors = call NeighborCache.getKeys();
         uint8_t dummyPayload = 0;
         uint16_t i = 0;
-        dbg(GENERAL_CHANNEL, "Timer fired event\n");
+        //dbg(GENERAL_CHANNEL, "Timer fired event\n");
         // Loop through neighbors and decrement their TTL or remove if expired
         for (i = 0; i < call NeighborCache.size(); i++) {
             if (neighbors[i] == 0) continue;
@@ -92,7 +90,7 @@ implementation {
             }
         }
         // Send a periodic PING broadcast to discover new neighbors
-        dbg(GENERAL_CHANNEL, "Sending periodic broadcast\n");
+        dbg(GENERAL_CHANNEL, "Sending periodic broadcast to discover new neighbor\n");
         makePack(&MessageToSend, TOS_NODE_ID, 0, 1, PROTOCOL_PING, 0, &dummyPayload, PACKET_MAX_PAYLOAD_SIZE);
         call Broadcast.send(MessageToSend, AM_BROADCAST_ADDR);
     }
