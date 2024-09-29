@@ -66,7 +66,6 @@ implementation {
     components NeighborDiscoveryC;
     Node.NeighborDiscovery -> NeighborDiscoveryC;
 
-    // Add TimerMilliC component to handle millisecond timer
-   components new TimerMilliC() as Timer0;  // <-- Add instantiation argument
+    components new TimerMilliC() as Timer0;  
     Node.Timer0 -> Timer0;
 }

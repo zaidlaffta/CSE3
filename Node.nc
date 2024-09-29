@@ -37,7 +37,7 @@ implementation {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
       // Start a timer to fire after 3 seconds
-      call Timer0.startOneShot(30);  // 3000 milliseconds = 3 seconds
+      //call Timer0.startOneShot(30); 
    }
 
    event void AMControl.startDone(error_t err) {
@@ -49,11 +49,6 @@ implementation {
          //Retry until successful
          call AMControl.start();
       }
-   }
-// Timer fired event after 3 seconds
-   event void Timer0.fired() {
-      dbg(GENERAL_CHANNEL, "Stopping radio after 3 seconds\n");
-      call AMControl.stop();  // Stop the radio after 3 seconds
    }
 
 
