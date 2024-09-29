@@ -139,13 +139,13 @@ def main():
     s.addChannel(s.GENERAL_CHANNEL);
 
     #Change runtime
-    s.runTime(100);
-    #s.ping(1, 2, "Hello, World");
+    s.runTime(10);
+    s.ping(1, 2, "Hello, World");
     #Change runtime
-    #s.runTime(1);
-    #s.ping(1, 3, "Hi!");
+    s.runTime(10);
+    s.ping(1, 3, "Hi!");
     #change runtime
-    #s.runTime(1);
+    s.runTime(10);
 
 if __name__ == '__main__':
     main()
