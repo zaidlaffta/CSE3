@@ -76,7 +76,7 @@ implementation {
 
     // Command to flood a packet through the network
     command void Flooding.Flood(pack* incomingPacket) {
-        dbg(GENERAL_CHANNEL, "Received packet at Node: %d, Seq: %d, TTL: %d\n", TOS_NODE_ID, incomingPacket->seq, incomingPacket->TTL);
+        dbg(GENERAL_CHANNEL, "Received Flooded Packet at Node: %d, Seq: %d, TTL: %d\n", TOS_NODE_ID, incomingPacket->seq, incomingPacket->TTL);
 
         // Check if the packet was already forwarded previously
         if (isPacketPreviouslySent(incomingPacket->seq, incomingPacket->src)) {
@@ -88,20 +88,20 @@ implementation {
         } 
         // If the packet has reached its destination
         else if (incomingPacket->dest == TOS_NODE_ID) {
-        dbg(GENERAL_CHANNEL, "Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
+        dbg(GENERAL_CHANNEL, "Flooded Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
 
             // Handle ping protocol
             if (incomingPacket->protocol == PROTOCOL_PING) {
-               dbg(GENERAL_CHANNEL, "Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
+               dbg(GENERAL_CHANNEL, "Flooded Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
                 call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
                 // Create a reply packet and send it back
                 createPacket(&packetToSend, incomingPacket->dest, incomingPacket->src, 10, PROTOCOL_PINGREPLY, currentSeqNum++, (uint8_t *) incomingPacket->payload, PACKET_MAX_PAYLOAD_SIZE);
                 call packetTransmitter.send(packetToSend, AM_BROADCAST_ADDR);
-                dbg(GENERAL_CHANNEL, "PingReply packet sent from Node: %d to Node: %d\n", TOS_NODE_ID, incomingPacket->src);
+                dbg(GENERAL_CHANNEL, "Flooded Packet sent from Node: %d to Node: %d\n", TOS_NODE_ID, incomingPacket->src);
             } 
             // Handle ping reply protocol
             else if (incomingPacket->protocol == PROTOCOL_PINGREPLY) {
-                dbg(GENERAL_CHANNEL, "PingReply received at destination Node: %d\n", TOS_NODE_ID);
+                dbg(GENERAL_CHANNEL, "Flooded Packet received at destination Node: %d\n", TOS_NODE_ID);
                 call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
             }
         } 
@@ -111,7 +111,7 @@ implementation {
             call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
             call packetTransmitter.send(*incomingPacket, AM_BROADCAST_ADDR);
             totalFloodedPackets++;                       
-            dbg(GENERAL_CHANNEL, "Forwarding packet from Node: %d, New TTL: %d, Total Flooded: %d\n", 
+            dbg(GENERAL_CHANNEL, "Forwarding Flooded Packet from Node: %d, New TTL: %d, Total Flooded: %d\n", 
                 TOS_NODE_ID, incomingPacket->TTL, totalFloodedPackets);
             // Print debug messages for tracking
             dbg(GENERAL_CHANNEL, "Total flooded packets: %d\n", totalFloodedPackets);
