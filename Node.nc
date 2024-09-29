@@ -113,7 +113,7 @@ implementation {
       dbg(GENERAL_CHANNEL, "******************************************\n");
       dbg(GENERAL_CHANNEL, "Neighbor discovered in the hashfunction");
    }
-   
+   // Handlers will be used in the future
    event void CommandHandler.printRouteTable() {}
 
    event void CommandHandler.printLinkState() {}

@@ -11,6 +11,6 @@ interface NeighborDiscovery {
     command uint32_t* fetchNeighbors();
     command uint16_t fetchNeighborCount();
     command void displayNeighbors();
-    command void clearExpiredNeighbors();  // New function
-    command uint16_t getNeighborTTL(uint32_t neighbor);  // New function
+    command void clearExpiredNeighbors();  
+    command uint16_t getNeighborTTL(uint32_t neighbor); 
 }

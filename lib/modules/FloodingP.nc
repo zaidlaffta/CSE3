@@ -18,7 +18,7 @@ module FloodingP {
 	uses interface SimpleSend as packetTransmitter;
     // This module uses the Hashmap interface with uint32_t keysw which t oprevent packet send previously
 	uses interface Hashmap<uint32_t> as PreviousPackets;
-    //timer to print number of flooding packets
+
 
 }
 implementation {
@@ -29,8 +29,8 @@ implementation {
 
     // Function to check if a key-value pair exists in the PreviousPackets hashmap
     bool isPacketPreviouslySent(uint32_t key, uint32_t val) {
-        if (call PreviousPackets.contains(key)) {        // Check if the key exists
-            if (call PreviousPackets.get(key) == val) {  // Verify the value associated with the key
+        if (call PreviousPackets.contains(key)) {        
+            if (call PreviousPackets.get(key) == val) {  
                  dbg(GENERAL_CHANNEL, "Packet already forwarded, skipping flood\n");
                 return TRUE;                             
             }
@@ -38,7 +38,6 @@ implementation {
         return FALSE;                                    
     }
 
-    // Function to create a packet based on input parameters
     void createPacket(pack *packet, uint16_t src, uint16_t dest, uint16_t ttl, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
         // Set various fields of the packet structure
         packet->src = src;                            
@@ -59,12 +58,11 @@ implementation {
     //Reset the total flooded packets counter
     void resetFloodedPacketCounter() {
         totalFloodedPackets = 0;                     
-        dbg(FLOODING_CHANNEL, "Flooded packet counter reset to 0 \n");  
+        dbg(GENERAL_CHANNEL, "Flooded packet counter reset to 0 \n");  
     }
 
     // Log the current sequence number for debugging
     void printCurrentSeqNum() {
-        dbg(FLOODING_CHANNEL, "Current sequence number: %d\n", currentSeqNum); // Debug message
         dbg(GENERAL_CHANNEL, "Current sequence number: %d\n", currentSeqNum);
     }
 
@@ -90,7 +88,7 @@ implementation {
         } 
         // If the packet has reached its destination
         else if (incomingPacket->dest == TOS_NODE_ID) {
-        dbg(FLOODING_CHANNEL, "Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
+        dbg(GENERAL_CHANNEL, "Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
 
             // Handle ping protocol
             if (incomingPacket->protocol == PROTOCOL_PING) {
@@ -113,7 +111,7 @@ implementation {
             call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
             call packetTransmitter.send(*incomingPacket, AM_BROADCAST_ADDR);
             totalFloodedPackets++;                       
-            dbg(FLOODING_CHANNEL, "Forwarding packet from Node: %d, New TTL: %d, Total Flooded: %d\n", 
+            dbg(GENERAL_CHANNEL, "Forwarding packet from Node: %d, New TTL: %d, Total Flooded: %d\n", 
                 TOS_NODE_ID, incomingPacket->TTL, totalFloodedPackets);
             // Print debug messages for tracking
             dbg(GENERAL_CHANNEL, "Total flooded packets: %d\n", totalFloodedPackets);

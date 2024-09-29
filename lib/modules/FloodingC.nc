@@ -8,7 +8,6 @@
 #include "../../includes/channels.h"
 
 #define AM_PACK 6  // Active Message ID for packet communication
-
 #define UNUSED_CONSTANT 100  // check the number of packet flooded
 
 configuration FloodingC {
