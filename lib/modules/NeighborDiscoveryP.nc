@@ -31,7 +31,6 @@ implementation {
     pack MessageToSend;
     // Helper function to prepare a packet with the specified parameters
     void makePack(pack *pkt, uint16_t src, uint16_t dest, uint16_t ttl, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t len);
-
     // Initializes the Neighbor Discovery process
     command error_t NeighborDiscovery.initialize() {
         // Start a periodic timer with a random interval

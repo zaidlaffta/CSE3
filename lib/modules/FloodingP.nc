@@ -9,7 +9,7 @@
 #include "../../includes/protocol.h"
 #include "../../includes/sendInfo.h"
 
-#define TTL_COMPARE = -500;
+#define TTL_COMPARE = 20;
 
 module FloodingP {
     // This module provides the Flooding interface, allowing other modules to access
@@ -90,7 +90,7 @@ implementation {
         else if (incomingPacket->dest == TOS_NODE_ID) {
         dbg(GENERAL_CHANNEL, "Flooded Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
 
-            // Handle ping protocol
+            // Handle Incoming protocol
             if (incomingPacket->protocol == PROTOCOL_PING) {
                dbg(GENERAL_CHANNEL, "Flooded Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
                 call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
