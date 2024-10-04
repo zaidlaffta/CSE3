@@ -74,7 +74,7 @@ implementation {
         currentSeqNum++;                                 
     }
 
-    // Command to flood a packet through the network
+    // Process received packet
     command void Flooding.Flood(pack* incomingPacket) {
         dbg(GENERAL_CHANNEL, "Received Flooded Packet at Node: %d, Seq: %d, TTL: %d\n", TOS_NODE_ID, incomingPacket->seq, incomingPacket->TTL);
 
@@ -86,7 +86,7 @@ implementation {
         else if (incomingPacket->TTL == 0) {
             dbg(GENERAL_CHANNEL, "Packet TTL expired at Node: %d, not forwarding\n", TOS_NODE_ID);
         } 
-        // If the packet has reached its destination
+        // If the packet has reached its own node
         else if (incomingPacket->dest == TOS_NODE_ID) {
         dbg(GENERAL_CHANNEL, "Flooded Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
 
@@ -95,7 +95,7 @@ implementation {
                dbg(GENERAL_CHANNEL, "Flooded Packet reached destination Node: %d, Protocol: %d\n", TOS_NODE_ID, incomingPacket->protocol);
                 call PreviousPackets.insert(incomingPacket->seq, incomingPacket->src);
                 // Create a reply packet and send it back
-                createPacket(&packetToSend, incomingPacket->dest, incomingPacket->src, 10, PROTOCOL_PINGREPLY, currentSeqNum++, (uint8_t *) incomingPacket->payload, PACKET_MAX_PAYLOAD_SIZE);
+                createPacket(&packetToSend, incomingPacket->dest, incomingPacket->src, 19, PROTOCOL_PINGREPLY, currentSeqNum++, (uint8_t *) incomingPacket->payload, PACKET_MAX_PAYLOAD_SIZE);
                 call packetTransmitter.send(packetToSend, AM_BROADCAST_ADDR);
                 dbg(GENERAL_CHANNEL, "Flooded Packet sent from Node: %d to Node: %d\n", TOS_NODE_ID, incomingPacket->src);
             } 
