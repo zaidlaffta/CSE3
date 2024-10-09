@@ -148,7 +148,7 @@ def main():
     # #change runtime
     # s.runTime(100);
     # s.boot(4)
-    s.runTime(500);
+   # s.runTime(500);
     
 
 if __name__ == '__main__':
