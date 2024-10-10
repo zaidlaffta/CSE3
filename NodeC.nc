@@ -35,8 +35,9 @@ implementation {
     // Adding neighbor discovery as component
     components NeighborDiscoveryC;
     Node.NeighborDiscovery -> NeighborDiscoveryC;
-   
-
+   //Linking project 2 to the main code
+    components LinkStateRoutingC;                  
+    Node.LinkStateRouting -> LinkStateRoutingC;
 
 
 }

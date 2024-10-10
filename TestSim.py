@@ -144,7 +144,7 @@ def main():
     #Change runtime
     s.runTime(10);
     s.ping(1, 3, "Hi!");
-    # s.kill(4)
+    # s.kill(4
     # #change runtime
     # s.runTime(100);
     # s.boot(4)

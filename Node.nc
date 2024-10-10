@@ -23,6 +23,7 @@ module Node {
    uses interface Receive;
    uses interface SimpleSend as Sender;
    uses interface CommandHandler;
+   uses interface LinkStateRouting as LinkStateRouting;
 }
 
 implementation {
@@ -33,6 +34,9 @@ implementation {
    event void Boot.booted() {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
+
+      //debug the linkstate routing protocol
+      call LinkStateRouting.start(); 
 
 
    }
@@ -69,7 +73,7 @@ implementation {
       if (len == sizeof(pack)) {
          pack* myMsg = (pack*) payload;
          // Don't print messages from neighbor probe packets or DV packets
-         if (strcmp((char*)(myMsg->payload), "NeighborProbing") && myMsg->protocol != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY) {
+         if (strcmp((char*)(myMsg->payload), "NeighborProbing") && myMsg->protocol != PROTOCOL_PING && myMsg->protocol != PROTOCOL_PINGREPLY myMsg->protocol != PROTOCOL_LS) {
             dbg(GENERAL_CHANNEL, "Packet Received\n");
             dbg(GENERAL_CHANNEL, "Package Payload: %s\n", myMsg->payload);
             dbg(GENERAL_CHANNEL, "%d\n", myMsg->protocol);
@@ -81,6 +85,9 @@ implementation {
             //dbg(GENERAL_CHANNEL, "Number of times Neighbor Discovery Called: %d\n", Neighbor_protocol);
             call NeighborDiscovery.displayNeighbors();
             dbg(GENERAL_CHANNEL, "******************************************\n");
+         }
+         else if(myMsg -> protocol == PROTOCOL_LS){
+            call LinkStateRouting.handleLS(myMsg); 
          }
          else {
             //dbg(GENERAL_CHANNEL, "Flooding function called here\n");
@@ -116,7 +123,9 @@ implementation {
    // Handlers will be used in the future
    event void CommandHandler.printRouteTable() {}
 
-   event void CommandHandler.printLinkState() {}
+   event void CommandHandler.printLinkState() {
+      call LinkStateRouting.printRouteTable();
+   }
 
    event void CommandHandler.printDistanceVector() {}
 
