@@ -176,11 +176,15 @@ implementation {
         return isStateUpdated;
     }
 
+    
+/*
     void sendLSP(uint8_t lostNeighbor) {
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
         uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
         uint16_t i = 0, counter = 0;
-    }
+    }*/
+
+
         // Remaining portion of sendLSP function
     void sendLSP(uint8_t lostNeighbor) {
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
