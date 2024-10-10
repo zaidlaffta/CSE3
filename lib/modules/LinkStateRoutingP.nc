@@ -90,25 +90,22 @@ implementation {
 
     command void LinkStateRouting.handleLS(pack* myMsg) {
     uint16_t seq;
-    
-    // Check if the packet is already in the hashmap
-    if (call PacketsReceived.containsKey(myMsg->src)) {
-        call PacketsReceived.get(myMsg->src, &seq);
+    bool exists = call PacketsReceived.contains(myMsg->src);
+
+    if (exists) {
+        seq = call PacketsReceived.get(myMsg->src);
         if (seq == myMsg->seq) {
             // Packet has already been processed
             return;
         }
     }
-    
-    // Insert or update the packet sequence number in the hashmap
+
     call PacketsReceived.insert(myMsg->src, myMsg->seq);
 
-    // If the state changes, rerun Dijkstra's algorithm
     if (updateState(myMsg)) {
         djikstra();
     }
 
-    // Forward the Link State Packet to all neighbors
     call Sender.send(*myMsg, AM_BROADCAST_ADDR);
 }
 
@@ -127,7 +124,7 @@ implementation {
 
     command void LinkStateRouting.handleNeighborFound() {
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
-        uint16_t neighborsListSize = call NeighborDiscovery.getNeighborListSize();
+        uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
         uint16_t i = 0;
         for(i = 0; i < neighborsListSize; i++) {
             linkState[TOS_NODE_ID][neighbors[i]] = 1;
@@ -181,13 +178,13 @@ implementation {
 
     void sendLSP(uint8_t lostNeighbor) {
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
-        uint16_t neighborsListSize = call NeighborDiscovery.getNeighborListSize();
+        uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
         uint16_t i = 0, counter = 0;
     }
         // Remaining portion of sendLSP function
     void sendLSP(uint8_t lostNeighbor) {
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
-        uint16_t neighborsListSize = call NeighborDiscovery.getNeighborListSize();
+        uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
         uint16_t i = 0, counter = 0;
         
         makePack(&routePack, TOS_NODE_ID, AM_BROADCAST_ADDR, LS_TTL, PROTOCOL_LS, sequenceNum++, NULL, PACKET_MAX_PAYLOAD_SIZE);

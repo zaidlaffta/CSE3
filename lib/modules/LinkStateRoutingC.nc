@@ -20,8 +20,8 @@ implementation {
     components new SimpleSendC(AM_PACK);
     LinkStateRoutingP.Sender -> SimpleSendC;
 
-    components new HashmapC(uint16_t, uint16_t, LS_MAX_ROUTES); 
-    LinkStateRoutingP.PacketsReceived -> HashmapC;
+    components new HashmapC(LS_MAX_ROUTES) as PacketsReceivedMap;
+    LinkStateRoutingP.PacketsReceived -> PacketsReceivedMap;
 
     components NeighborDiscoveryC;
     LinkStateRoutingP.NeighborDiscovery -> NeighborDiscoveryC;    
