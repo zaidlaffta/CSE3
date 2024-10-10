@@ -5,6 +5,7 @@
 #include "../../includes/CommandMsg.h"
 #include "../../includes/command.h"
 
+
 #define LS_MAX_ROUTES 256
 #define LS_MAX_COST 17
 #define LS_TTL 17
@@ -178,25 +179,19 @@ implementation {
     }
 
 
-/*
-    void sendLSP(uint8_t lostNeighbor) {
-        uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
-        uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
-        uint16_t i = 0, counter = 0;
-    }*/
 
-
-    void sendLSP(uint8_t lostNeighbor) {
+void sendLSP(uint8_t lostNeighbor) {
     uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
     uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
     uint16_t i = 0, counter = 0;
-    
-    // Initialize the packet structure and ensure the payload is correctly set up
+
+    // Prepare the packet structure and ensure payload allocation
     makePack(&routePack, TOS_NODE_ID, AM_BROADCAST_ADDR, LS_TTL, PROTOCOL_LS, sequenceNum++, NULL, PACKET_MAX_PAYLOAD_SIZE);
 
-    // Check that routePack.payload is accessible and correctly cast it to LSP*
-    LSP* lsp = (LSP *) routePack.payload;
+    // Casting payload as an array of LSP structures
+    LSP *lsp = (LSP *)(routePack.payload);
 
+    // Iterate through neighbors and fill the LSP array
     for (i = 0; i < neighborsListSize && counter < 10; i++) {
         lsp[counter].neighbor = neighbors[i];
         lsp[counter].cost = (neighbors[i] == lostNeighbor) ? LS_MAX_COST : 1;
@@ -208,6 +203,8 @@ implementation {
     }
 }
 
+
+   
 
 
     // Djikstra's algorithm for computing shortest paths
