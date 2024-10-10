@@ -1,6 +1,9 @@
 #include <Timer.h>
-#include "../../includes/CommandMsg.h"
+#include "../../includes/channels.h"
 #include "../../includes/packet.h"
+#include "../../includes/protocol.h"
+#include "../../includes/CommandMsg.h"
+#include "../../includes/command.h"
 
 // Link state vars
 #define LS_MAX_ROUTES 256

@@ -2,6 +2,8 @@
 #include "../../includes/channels.h"
 #include "../../includes/packet.h"
 #include "../../includes/protocol.h"
+#include "../../includes/CommandMsg.h"
+#include "../../includes/command.h"
 // Link state vars
 #define LS_MAX_ROUTES 256
 #define LS_MAX_COST 17
@@ -119,7 +121,7 @@ implementation {
     }
 
     command void LinkStateRouting.handleNeighborFound() {
-        uint32_t* neighbors = call NeighborDiscovery.getNeighbors();
+        uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
         uint16_t neighborsListSize = call NeighborDiscovery.getNeighborListSize();
         uint16_t i = 0;
         for(i = 0; i < neighborsListSize; i++) {
@@ -183,7 +185,7 @@ implementation {
     }
 
     void sendLSP(uint8_t lostNeighbor) {
-        uint32_t* neighbors = call NeighborDiscovery.getNeighbors();
+        uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
         uint16_t neighborsListSize = call NeighborDiscovery.getNeighborListSize();
         uint16_t i = 0, counter = 0;
         LSP linkStatePayload[10];
