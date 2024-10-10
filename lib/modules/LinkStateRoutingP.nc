@@ -1,11 +1,10 @@
-
 #include <Timer.h>
 #include "../../includes/channels.h"
 #include "../../includes/packet.h"
 #include "../../includes/protocol.h"
 #include "../../includes/CommandMsg.h"
 #include "../../includes/command.h"
-// Link state vars
+
 #define LS_MAX_ROUTES 256
 #define LS_MAX_COST 17
 #define LS_TTL 17
@@ -50,67 +49,59 @@ implementation {
     void handleForward(pack* myMsg);
     void djikstra();
 
-    command error_t LinkStateRouting.start() {        // Initialize routing table and neighbor state structures// Start one-shot
-        dbg(ROUTING_CHANNEL, "Link State Routing Started on node %u!\n", TOS_NODE_ID);
+    command error_t LinkStateRouting.start() {
+        dbg(GENERAL_CHANNEL, "Link State Routing Started on node %u!\n", TOS_NODE_ID);
         initilizeRoutingTable();
-        call LSRTimer.startOneShot(30000);
-   }
+        call LSRTimer.startPeriodic(30000);
+    }
 
     event void LSRTimer.fired() {
-        if(call LSRTimer.isOneShot()) {
-            call LSRTimer.startPeriodic(30000 + (uint16_t) (call Random.rand16()%5000));
-        } else {
-            // Send flooding packet w/neighbor list
-            dbg(ROUTING_CHANNEL, "sending flooding packet w neighbor list");
-
-            sendLSP(0);
-        }
+        dbg(GENERAL_CHANNEL, "sending flooding packet w neighbor list");
+        sendLSP(0);
     }
 
     command void LinkStateRouting.ping(uint16_t destination, uint8_t *payload) {
         makePack(&routePack, TOS_NODE_ID, destination, 0, PROTOCOL_PING, 0, payload, PACKET_MAX_PAYLOAD_SIZE);
-        dbg(ROUTING_CHANNEL, "PING FROM %d TO %d\n", TOS_NODE_ID, destination);
+        dbg(GENERAL_CHANNEL, "PING FROM %d TO %d\n", TOS_NODE_ID, destination);
         call LinkStateRouting.routePacket(&routePack);
     }    
 
     command void LinkStateRouting.routePacket(pack* myMsg) {
-        // Look up value in table and forward
         uint8_t nextHop;
         if(myMsg->dest == TOS_NODE_ID && myMsg->protocol == PROTOCOL_PING) {
-            dbg(ROUTING_CHANNEL, "PING Packet has reached destination %d!!!\n", TOS_NODE_ID);
+            dbg(GENERAL_CHANNEL, "PING Packet has reached destination %d!!!\n", TOS_NODE_ID);
             makePack(&routePack, myMsg->dest, myMsg->src, 0, PROTOCOL_PINGREPLY, 0,(uint8_t *) myMsg->payload, PACKET_MAX_PAYLOAD_SIZE);
             call LinkStateRouting.routePacket(&routePack);
             return;
         } else if(myMsg->dest == TOS_NODE_ID && myMsg->protocol == PROTOCOL_PINGREPLY) {
-            dbg(ROUTING_CHANNEL, "PING_REPLY Packet has reached destination %d!!!\n", TOS_NODE_ID);
+            dbg(GENERAL_CHANNEL, "PING_REPLY Packet has reached destination %d!!!\n", TOS_NODE_ID);
             return;
         }
         if(routingTable[myMsg->dest].cost < LS_MAX_COST) {
             nextHop = routingTable[myMsg->dest].nextHop;
-            dbg(ROUTING_CHANNEL, "Node %d routing packet through %d\n", TOS_NODE_ID, nextHop);
-            call Sender.send(*myMsg, nextHop);
+            dbg(GENERAL_CHANNEL, "Node %d routing packet through %d\n", TOS_NODE_ID, nextHop);
+            if (call Sender.send(*myMsg, nextHop) != SUCCESS) {
+                dbg(GENERAL_CHANNEL, "Failed to send packet.\n");
+            }
         } else {
-            dbg(ROUTING_CHANNEL, "No route to destination. Dropping packet...\n");
+            dbg(GENERAL_CHANNEL, "No route to destination. Dropping packet...\n");
         }
     }
 
     command void LinkStateRouting.handleLS(pack* myMsg) {
-        // Check seq number
         if(myMsg->src == TOS_NODE_ID || call PacketsReceived.containsVal(myMsg->src, myMsg->seq)) {
             return;
         } else {
             call PacketsReceived.insertVal(myMsg->src, myMsg->seq);
         }
-        // If state changed -> rerun djikstra
         if(updateState(myMsg)) {
             djikstra();
         }
-        // Forward to all neighbors
         call Sender.send(*myMsg, AM_BROADCAST_ADDR);
     }
 
     command void LinkStateRouting.handleNeighborLost(uint16_t lostNeighbor) {
-        dbg(ROUTING_CHANNEL, "Neighbor lost %u\n", lostNeighbor);
+        dbg(GENERAL_CHANNEL, "Neighbor lost %u\n", lostNeighbor);
         if(linkState[TOS_NODE_ID][lostNeighbor] != LS_MAX_COST) {
             linkState[TOS_NODE_ID][lostNeighbor] = LS_MAX_COST;
             linkState[lostNeighbor][TOS_NODE_ID] = LS_MAX_COST;
@@ -135,35 +126,25 @@ implementation {
 
     command void LinkStateRouting.printRouteTable() {
         uint16_t i;
-        dbg(ROUTING_CHANNEL, "DEST  HOP  COST\n");
+        dbg(GENERAL_CHANNEL, "DEST  HOP  COST\n");
         for(i = 1; i < LS_MAX_ROUTES; i++) {
             if(routingTable[i].cost != LS_MAX_COST)
-                dbg(ROUTING_CHANNEL, "%4d%5d%6d\n", i, routingTable[i].nextHop, routingTable[i].cost);
+                dbg(GENERAL_CHANNEL, "%4d%5d%6d\n", i, routingTable[i].nextHop, routingTable[i].cost);
         }
     }
 
     void initilizeRoutingTable() {
         uint16_t i, j;
         for(i = 0; i < LS_MAX_ROUTES; i++) {
+            for(j = 0; j < LS_MAX_ROUTES; j++) {
+                linkState[i][j] = (i == j) ? 0 : LS_MAX_COST;
+            }
             routingTable[i].nextHop = 0;
             routingTable[i].cost = LS_MAX_COST;
         }
-        for(i = 0; i < LS_MAX_ROUTES; i++) {
-            linkState[i][0] = 0;
-        }
-        for(i = 0; i < LS_MAX_ROUTES; i++) {
-            linkState[0][i] = 0;
-        }
-        for(i = 1; i < LS_MAX_ROUTES; i++) {
-            for(j = 1; j < LS_MAX_ROUTES; j++) {
-                linkState[i][j] = LS_MAX_COST;
-            }
-        }
         routingTable[TOS_NODE_ID].nextHop = TOS_NODE_ID;
         routingTable[TOS_NODE_ID].cost = 0;
-        linkState[TOS_NODE_ID][TOS_NODE_ID] = 0;
         numKnownNodes++;
-        numRoutes++;
     }
 
     bool updateState(pack* myMsg) {
@@ -189,114 +170,71 @@ implementation {
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
         uint16_t neighborsListSize = call NeighborDiscovery.getNeighborListSize();
         uint16_t i = 0, counter = 0;
-        LSP linkStatePayload[10];
-        // Zero out the array
-        for(i = 0; i < 10; i++) {
-            linkStatePayload[i].neighbor = 0;
-            linkStatePayload[i].cost = 0;
-        }
-        i = 0;
-        // If neighbor lost -> send out infinite cost
-        if(lostNeighbor != 0) {
-            dbg(ROUTING_CHANNEL, "Sending out lost neighbor %u\n", lostNeighbor);
-            linkStatePayload[counter].neighbor = lostNeighbor;
-            linkStatePayload[counter].cost = LS_MAX_COST;
-            i++;
-            counter++;
-        }
-        // Add neighbors in groups of 10 and flood LSP to all neighbors
-        for(; i < neighborsListSize; i++) {
-            linkStatePayload[counter].neighbor = neighbors[i];
-            linkStatePayload[counter].cost = 1;
-            counter++;
-            if(counter == 10 || i == neighborsListSize-1) {
-                // Send LSP to each neighbor                
-                makePack(&routePack, TOS_NODE_ID, 0, LS_TTL, PROTOCOL_LS, sequenceNum++, &linkStatePayload, sizeof(linkStatePayload));
-                //dbg(ROUTING_CHANNEL, "sending LS packet\n");
-
-                call Sender.send(routePack, AM_BROADCAST_ADDR);
-                // Zero the array
-                while(counter > 0) {
-                    counter--;
-                    linkStatePayload[i].neighbor = 0;
-                    linkStatePayload[i].cost = 0;
-                }
-            }
-        }
     }
-
-    void djikstra() {
-        uint16_t i = 0;
-        uint8_t currentNode = TOS_NODE_ID, minCost = LS_MAX_COST, nextNode = 0, prevNode = 0;
-        uint8_t prev[LS_MAX_ROUTES];
-        uint8_t cost[LS_MAX_ROUTES];
-        bool visited[LS_MAX_ROUTES];
-        uint16_t count = numKnownNodes;
-        for(i = 0; i < LS_MAX_ROUTES; i++) {
-            cost[i] = LS_MAX_COST;
-            prev[i] = 0;
-            visited[i] = FALSE;
-        }
-        cost[currentNode] = 0;
-        prev[currentNode] = 0;
-        while(TRUE) {
-            for(i = 1; i < LS_MAX_ROUTES; i++) {
-                if(i != currentNode && linkState[currentNode][i] < LS_MAX_COST && cost[currentNode] + linkState[currentNode][i] < cost[i]) {
-                    cost[i] = cost[currentNode] + linkState[currentNode][i];
-                    prev[i] = currentNode;
-                }
-            }
-            visited[currentNode] = TRUE;            
-            minCost = LS_MAX_COST;
-            nextNode = 0;
-            for(i = 1; i < LS_MAX_ROUTES; i++) {
-                if(cost[i] < minCost && !visited[i]) {
-                    minCost = cost[i];
-                    nextNode = i;
-                }
-            }
-            currentNode = nextNode;
-            if(--count == 0) {
-                break;
-            }
-        }
-        // NEED: add route to table
-        for(i = 1; i < LS_MAX_ROUTES; i++) {
-            if(i == TOS_NODE_ID) {
-                continue;
-            }
-            if(cost[i] != LS_MAX_COST) {
-                prevNode = i;
-                while(prev[prevNode] != TOS_NODE_ID) {
-                    prevNode = prev[prevNode];
-                }
-                addRoute(i, prevNode, cost[i]);
+        // Remaining portion of sendLSP function
+    void sendLSP(uint8_t lostNeighbor) {
+        uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
+        uint16_t neighborsListSize = call NeighborDiscovery.getNeighborListSize();
+        uint16_t i = 0, counter = 0;
+        
+        makePack(&routePack, TOS_NODE_ID, AM_BROADCAST_ADDR, LS_TTL, PROTOCOL_LS, sequenceNum++, NULL, PACKET_MAX_PAYLOAD_SIZE);
+        LSP* lsp = (LSP *) routePack.payload;
+        
+        for(i = 0; i < neighborsListSize && counter < 10; i++) {
+            lsp[counter].neighbor = neighbors[i];
+            if (neighbors[i] == lostNeighbor) {
+                lsp[counter].cost = LS_MAX_COST;
             } else {
-                removeRoute(i);
+                lsp[counter].cost = 1; // Assuming direct neighbors have a cost of 1
+            }
+            counter++;
+        }
+        if (call Sender.send(routePack, AM_BROADCAST_ADDR) != SUCCESS) {
+            dbg(GENERAL_CHANNEL, "Failed to send LSP packet.\n");
+        }
+    }
+
+    // Djikstra's algorithm for computing shortest paths
+    void djikstra() {
+        uint8_t visited[LS_MAX_ROUTES];
+        uint8_t i, j, closestNode;
+        uint8_t minDistance;
+        
+        // Initialize distances and visited
+        for(i = 0; i < LS_MAX_ROUTES; i++) {
+            visited[i] = FALSE;
+            routingTable[i].cost = linkState[TOS_NODE_ID][i];
+            routingTable[i].nextHop = (routingTable[i].cost < LS_MAX_COST) ? i : 0;
+        }
+        visited[TOS_NODE_ID] = TRUE;
+        
+        // Run Djikstra's algorithm
+        for(i = 1; i < numKnownNodes; i++) {
+            minDistance = LS_MAX_COST;
+            closestNode = 0;
+
+            // Find the closest unvisited node
+            for(j = 0; j < LS_MAX_ROUTES; j++) {
+                if (!visited[j] && routingTable[j].cost < minDistance) {
+                    minDistance = routingTable[j].cost;
+                    closestNode = j;
+                }
+            }
+
+            // Mark the closest node as visited
+            visited[closestNode] = TRUE;
+
+            // Update distances to remaining nodes through the closest node
+            for(j = 0; j < LS_MAX_ROUTES; j++) {
+                if (!visited[j] && linkState[closestNode][j] < LS_MAX_COST) {
+                    uint8_t newCost = routingTable[closestNode].cost + linkState[closestNode][j];
+                    if (newCost < routingTable[j].cost) {
+                        routingTable[j].cost = newCost;
+                        routingTable[j].nextHop = routingTable[closestNode].nextHop;
+                    }
+                }
             }
         }
+        dbg(GENERAL_CHANNEL, "Routing table updated with Djikstra's algorithm\n");
     }
-
-    void addRoute(uint8_t dest, uint8_t nextHop, uint8_t cost) {
-        if(cost < routingTable[dest].cost) {
-            routingTable[dest].nextHop = nextHop;
-            routingTable[dest].cost = cost;
-            numRoutes++;
-        }
-    }
-
-    void removeRoute(uint8_t dest) {
-        routingTable[dest].nextHop = 0;
-        routingTable[dest].cost = LS_MAX_COST;
-        numRoutes--;
-    }
-
-    void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, void* payload, uint8_t length) {
-        Package->src = src;
-        Package->dest = dest;
-        Package->TTL = TTL;
-        Package->seq = seq;
-        Package->protocol = protocol;
-        memcpy(Package->payload, payload, length);
-    }                            
 }
