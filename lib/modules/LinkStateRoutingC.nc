@@ -14,6 +14,13 @@ configuration LinkStateRoutingC {
     uses interface Timer<TMilli> as RouteTimer; // Timer for periodic LSP sending
 }
 
+// Make sure the following module is connected to this configuration
 implementation {
-    // Here we can define any additional configurations if necessary
+    components LinkStateRoutingP;
+    connections
+        LinkStateRoutingP.LinkStateRouting -> LinkStateRouting; // Connect LinkStateRouting
+        LinkStateRoutingP.NeighborDiscovery -> NeighborDiscovery; // Connect NeighborDiscovery
+        LinkStateRoutingP.Sender -> Sender; // Connect Sender interface
+        LinkStateRoutingP.AMSend -> AMSend; // Connect AMSend interface
+        LinkStateRoutingP.RouteTimer -> RouteTimer; // Connect RouteTimer interface
 }
