@@ -13,7 +13,7 @@ module LinkStateRoutingP {
     provides interface LinkStateRouting;
     
     uses interface SimpleSend as Sender;
-    uses interface Map<uint16_t, uint16_t> as PacketsReceived; 
+    uses interface Hashmap<uint16_t, uint16_t> as PacketsReceived;
     uses interface NeighborDiscovery as NeighborDiscovery;
     uses interface Flooding as Flooding;
     uses interface Timer<TMilli> as LSRTimer;                       
@@ -89,16 +89,29 @@ implementation {
     }
 
     command void LinkStateRouting.handleLS(pack* myMsg) {
-        if(myMsg->src == TOS_NODE_ID || call PacketsReceived.containsVal(myMsg->src, myMsg->seq)) {
+    uint16_t seq;
+    
+    // Check if the packet is already in the hashmap
+    if (call PacketsReceived.containsKey(myMsg->src)) {
+        call PacketsReceived.get(myMsg->src, &seq);
+        if (seq == myMsg->seq) {
+            // Packet has already been processed
             return;
-        } else {
-            call PacketsReceived.insertVal(myMsg->src, myMsg->seq);
         }
-        if(updateState(myMsg)) {
-            djikstra();
-        }
-        call Sender.send(*myMsg, AM_BROADCAST_ADDR);
     }
+    
+    // Insert or update the packet sequence number in the hashmap
+    call PacketsReceived.insert(myMsg->src, myMsg->seq);
+
+    // If the state changes, rerun Dijkstra's algorithm
+    if (updateState(myMsg)) {
+        djikstra();
+    }
+
+    // Forward the Link State Packet to all neighbors
+    call Sender.send(*myMsg, AM_BROADCAST_ADDR);
+}
+
 
     command void LinkStateRouting.handleNeighborLost(uint16_t lostNeighbor) {
         dbg(GENERAL_CHANNEL, "Neighbor lost %u\n", lostNeighbor);
