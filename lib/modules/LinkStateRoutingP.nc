@@ -477,3 +477,6 @@ implementation {
         while(TRUE) {
             uint8_t minCost = LS_MAX_COST;
             uint8_t nextNode = 0;
+        }
+    }
+}
