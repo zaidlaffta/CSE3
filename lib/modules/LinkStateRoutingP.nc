@@ -13,7 +13,7 @@ module LinkStateRoutingP {
     provides interface LinkStateRouting;
     
     uses interface SimpleSend as Sender;
-    uses interface Hashmap(LS_MAX_ROUTES) as PacketsReceived;
+    uses interface Hashmap<uint16_t> as PacketsReceived;
     uses interface NeighborDiscovery as NeighborDiscovery;
     uses interface Flooding as Flooding;
     uses interface Timer<TMilli> as LSRTimer;                       
