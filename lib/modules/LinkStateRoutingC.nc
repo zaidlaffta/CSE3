@@ -5,34 +5,15 @@
 #include "../../includes/CommandMsg.h"
 #include "../../includes/command.h"
 
-#define LS_MAX_ROUTES 256
-#define LS_MAX_COST 17
-#define LS_TTL 17
-
+// LinkStateRoutingC.nc
 configuration LinkStateRoutingC {
     provides interface LinkStateRouting;
+    uses interface NeighborDiscovery; // Use the Neighbor Discovery interface
+    uses interface Packet as Sender;   // Use a packet interface for sending
+    uses interface AMSend;             // Use AMSend for sending messages
+    uses interface Timer<TMilli> as RouteTimer; // Timer for periodic LSP sending
 }
 
 implementation {
-    components LinkStateRoutingP;
-    LinkStateRouting = LinkStateRoutingP;
-
-    components new SimpleSendC(AM_PACK);
-    LinkStateRoutingP.Sender -> SimpleSendC;
-
-    components new HashmapC(LS_MAX_ROUTES) as PacketsReceivedMap;
-    LinkStateRoutingP.PacketsReceived -> PacketsReceivedMap;
-
-    components NeighborDiscoveryC;
-    LinkStateRoutingP.NeighborDiscovery -> NeighborDiscoveryC;    
-
-    components FloodingC;
-    LinkStateRoutingP.Flooding -> FloodingC;
-
-    components new TimerMilliC() as LSRTimer;   
-    LinkStateRoutingP.LSRTimer -> LSRTimer;
-
-    components RandomC as Random;               
-    LinkStateRoutingP.Random -> Random;
-    
+    // Here we can define any additional configurations if necessary
 }
