@@ -8,5 +8,4 @@ interface LinkStateRouting {
     command void handleNeighborLost(uint16_t lostNeighbor);
     command void handleNeighborFound();
     command void printRouteTable();
-    
 }

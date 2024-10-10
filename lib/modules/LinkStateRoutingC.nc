@@ -18,7 +18,7 @@ implementation {
     components new SimpleSendC(AM_PACK);
     LinkStateRoutingP.Sender -> SimpleSendC;
 
-    components new MapListC(uint16_t, uint16_t, LS_MAX_ROUTES, 30); //what to do with maplist, same as the other time?
+    components new MapListC(uint16_t, uint16_t, LS_MAX_ROUTES, 30);
     LinkStateRoutingP.PacketsReceived -> MapListC;
 
     components NeighborDiscoveryC;

@@ -159,7 +159,7 @@ implementation {
 
     bool updateState(pack* myMsg) {
         uint16_t i;
-        LSP *lsp = (LSP *)myMsg->payload;
+        LSP* lsp = (LSP *)myMsg->payload;
         bool isStateUpdated = FALSE;
         for (i = 0; i < 10; i++) {
             if (linkState[myMsg->src][lsp[i].neighbor] != lsp[i].cost) {
@@ -250,9 +250,7 @@ implementation {
         }
 
         for (i = 1; i < LS_MAX_ROUTES; i++) {
-            if (i == TOS_NODE_ID) {
-                continue;
-            }
+            if (i == TOS_NODE_ID) { continue; }
             if (cost[i] != LS_MAX_COST) {
                 prevNode = i;
                 while (prev[prevNode] != TOS_NODE_ID) {
