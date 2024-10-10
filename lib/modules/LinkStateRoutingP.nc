@@ -429,4 +429,4 @@ implementation {
                 dbg(ROUTING_CHANNEL, "%4d%5d%6d\n", i, routingTable[i].nextHop, routingTable[i].cost);
         }
     }
-}
+} //comment
