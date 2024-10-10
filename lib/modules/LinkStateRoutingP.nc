@@ -176,7 +176,7 @@ implementation {
         return isStateUpdated;
     }
 
-    
+
 /*
     void sendLSP(uint8_t lostNeighbor) {
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
@@ -185,28 +185,34 @@ implementation {
     }*/
 
 
-        // Remaining portion of sendLSP function
-    void sendLSP(uint8_t lostNeighbor) {
-        uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
-        uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
-        uint16_t i = 0, counter = 0;
-        
-        makePack(&routePack, TOS_NODE_ID, AM_BROADCAST_ADDR, LS_TTL, PROTOCOL_LS, sequenceNum++, NULL, PACKET_MAX_PAYLOAD_SIZE);
-        LSP* lsp = (LSP *) routePack.payload;
-        
-        for(i = 0; i < neighborsListSize && counter < 10; i++) {
-            lsp[counter].neighbor = neighbors[i];
-            if (neighbors[i] == lostNeighbor) {
-                lsp[counter].cost = LS_MAX_COST;
-            } else {
-                lsp[counter].cost = 1; // Assuming direct neighbors have a cost of 1
-            }
-            counter++;
+      void sendLSP(uint8_t lostNeighbor) {
+    uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
+    uint16_t neighborsListSize = call NeighborDiscovery.fetchNeighborCount();
+    uint16_t i = 0, counter = 0;
+    
+    // Initialize the packet with necessary parameters
+    makePack(&routePack, TOS_NODE_ID, AM_BROADCAST_ADDR, LS_TTL, PROTOCOL_LS, sequenceNum++, NULL, PACKET_MAX_PAYLOAD_SIZE);
+
+    // Ensure that payload size is sufficient for LSP struct, and then assign the payload
+    LSP* lsp = (LSP *) routePack.payload;  // Explicitly casting the payload pointer
+
+    // Populate the LSP packet with neighbor data
+    for (i = 0; i < neighborsListSize && counter < 10; i++) {
+        lsp[counter].neighbor = neighbors[i];
+        if (neighbors[i] == lostNeighbor) {
+            lsp[counter].cost = LS_MAX_COST;
+        } else {
+            lsp[counter].cost = 1;  // Assuming direct neighbors have a cost of 1
         }
-        if (call Sender.send(routePack, AM_BROADCAST_ADDR) != SUCCESS) {
-            dbg(GENERAL_CHANNEL, "Failed to send LSP packet.\n");
-        }
+        counter++;
     }
+    
+    // Send the packet
+    if (call Sender.send(routePack, AM_BROADCAST_ADDR) != SUCCESS) {
+        dbg(GENERAL_CHANNEL, "Failed to send LSP packet.\n");
+    }
+}
+
 
     // Djikstra's algorithm for computing shortest paths
     void djikstra() {
