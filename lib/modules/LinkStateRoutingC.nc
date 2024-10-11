@@ -2,34 +2,27 @@
 #include "../../includes/CommandMsg.h"
 #include "../../includes/packet.h"
 
-// Link state vars
-#define LS_MAX_ROUTES 256
-#define LS_MAX_COST 17
-#define LS_TTL 17
+#define AM_ROUTING 63
 
-configuration LinkStateRoutingC {
-    provides interface LinkStateRouting;
+configuration LinkStateRoutingC{
+	provides interface LinkStateRouting;
+	//provides interface Receive;
 }
 
-implementation {
-    components LinkStateRoutingP;
-    LinkStateRouting = LinkStateRoutingP;
+implementation{
+	components LinkStateRoutingP;
+	components new TimerMilliC() as PeriodicTimer;
+	components new SimpleSendC(AM_ROUTING);
+	components new AMReceiverC(AM_ROUTING);
 
-    components new SimpleSendC(AM_PACK);
-    LinkStateRoutingP.Sender -> SimpleSendC;
+	components NeighborDiscoveryC;
+	LinkStateRoutingP.NeighborDiscovery -> NeighborDiscoveryC;
+	
+	LinkStateRouting = LinkStateRoutingP.LinkStateRouting;
+	//Receive = LinkStateRoutingP.LinkStateRoutingReceive;
 
-    components new MapListC(uint16_t, uint16_t, LS_MAX_ROUTES, 30);
-    LinkStateRoutingP.PacketsReceived -> MapListC;
+	LinkStateRoutingP.Sender -> SimpleSendC;
+	LinkStateRoutingP.Receive -> AMReceiverC;
+	LinkStateRoutingP.PeriodicTimer -> PeriodicTimer;
 
-    components NeighborDiscoveryC;
-    LinkStateRoutingP.NeighborDiscovery -> NeighborDiscoveryC;    
-
-    components FloodingC;
-    LinkStateRoutingP.Flooding -> FloodingC;
-
-    components new TimerMilliC() as LSRTimer;   
-    LinkStateRoutingP.LSRTimer -> LSRTimer;
-
-    components RandomC as Random;               
-    LinkStateRoutingP.Random -> Random;
 }
