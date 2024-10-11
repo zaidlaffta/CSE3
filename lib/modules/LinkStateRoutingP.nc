@@ -41,7 +41,7 @@ implementation {
 
     command void LinkStateRouting.start() {
         dbg(GENERAL_CHANNEL, "Starting Routing\n");
-        call NeighborDiscovery.processDiscovery(pack* message);
+        call NeighborDiscovery.processDiscovery(myMsg);
         call PeriodicTimer.startPeriodic(10000);
     }
 
