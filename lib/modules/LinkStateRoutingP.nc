@@ -17,7 +17,7 @@ module LinkStateRoutingP {
 
 implementation {
     // Just use an array to store routing entries
-    uint8_t LinkStateRoutingS LinkStateRoutingS[255];
+    LinkStateRoutingS LinkStateRoutingS[255];
     // Keeps track of number of items in the array
     uint16_t counter = 0;
 
@@ -34,7 +34,7 @@ implementation {
     }
 
     command void LinkStateRouting.start() {
-        dbg(ROUTING_CHANNEL, "Starting Routing\n");
+        dbg(GENERAL_CHANNEL, "Starting Routing\n");
         call NeighborDiscovery.start();
         call PeriodicTimer.startPeriodic(10000);
     }
@@ -145,12 +145,12 @@ implementation {
     }
 
     command void LinkStateRouting.print() {
-        dbg(ROUTING_CHANNEL, "Printing Routing Table\n");
-        dbg(ROUTING_CHANNEL, "Dest\tHop\tCount\n");
+        dbg(GENERAL_CHANNEL, "Printing Routing Table\n");
+        dbg(GENERAL_CHANNEL, "Dest\tHop\tCount\n");
                 
         for (uint32_t i = 0; i < counter; i++) {
             if (LinkStateRoutingS[i].dest != 0) {
-                dbg(ROUTING_CHANNEL, "%u\t\t%u\t%u\n", LinkStateRoutingS[i].dest, LinkStateRoutingS[i].nextHop, LinkStateRoutingS[i].cost);
+                dbg(GENERAL_CHANNEL, "%u\t\t%u\t%u\n", LinkStateRoutingS[i].dest, LinkStateRoutingS[i].nextHop, LinkStateRoutingS[i].cost);
             }
         }
     }
