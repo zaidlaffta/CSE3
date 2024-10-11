@@ -46,7 +46,8 @@ implementation {
     }
 
     command uint16_t LinkStateRouting.getNextHop(uint16_t finalDest) {
-        for (uint16_t i = 0; i < counter; i++) {
+        uint16_t i;
+        for (i = 0; i < counter; i++) {
             if (LinkStateRoutingTable[i].dest == finalDest && LinkStateRoutingTable[i].cost < 999) {
                 return LinkStateRoutingTable[i].nextHop;
             }
