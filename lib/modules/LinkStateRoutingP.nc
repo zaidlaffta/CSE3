@@ -1,7 +1,10 @@
 #include <Timer.h>
-#include "../../includes/channels.h"
+#include "../../includes/CommandMsg.h"
 #include "../../includes/packet.h"
+#include "../../includes/channels.h"
 #include "../../includes/protocol.h"
+#include "../../includes/sendInfo.h"
+
 
 module LinkStateRoutingP {
     provides interface LinkStateRouting;
@@ -14,7 +17,7 @@ module LinkStateRoutingP {
 
 implementation {
     // Just use an array to store routing entries
-    LinkStateRoutingS LinkStateRoutingS[255];
+    uint8_t LinkStateRoutingS LinkStateRoutingS[255];
     // Keeps track of number of items in the array
     uint16_t counter = 0;
 

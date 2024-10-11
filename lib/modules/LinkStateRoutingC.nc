@@ -1,6 +1,10 @@
 #include <Timer.h>
+#include<array.h>
 #include "../../includes/CommandMsg.h"
 #include "../../includes/packet.h"
+#include "../../includes/channels.h"
+#include "../../includes/protocol.h"
+#include "../../includes/sendInfo.h"
 
 #define AM_ROUTING 63
 
