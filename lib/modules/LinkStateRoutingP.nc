@@ -39,7 +39,7 @@ implementation {
         memcpy(Package->payload, payload, length);
     }
 
-    command void LinkStateRouting.processDiscovery() {
+    command void LinkStateRouting.start() {
         dbg(GENERAL_CHANNEL, "Starting Routing\n");
         call NeighborDiscovery.processDiscovery();
         call PeriodicTimer.startPeriodic(10000);
