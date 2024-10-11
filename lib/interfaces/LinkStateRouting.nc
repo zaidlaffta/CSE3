@@ -1,5 +1,5 @@
 #include "../../includes/packet.h"
-#include "../../includes/listInfo.h"
+
 
 interface LinkStateRouting{
 	command void start();
