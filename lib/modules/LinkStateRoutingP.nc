@@ -27,7 +27,7 @@ implementation {
     // Keeps track of number of items in the array
     uint16_t counter = 0;
 
-    pack myMsg;
+    pack* myMsg = (pack*) payload;
 
     // Function to create a packet
     void makePack(pack *Package, uint16_t src, uint16_t dest, uint16_t TTL, uint16_t protocol, uint16_t seq, uint8_t* payload, uint8_t length) {
