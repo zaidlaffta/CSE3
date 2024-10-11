@@ -19,7 +19,7 @@ implementation{
 	LinkStateRoutingP.NeighborDiscovery -> NeighborDiscoveryC;
 	
 	LinkStateRouting = LinkStateRoutingP.LinkStateRouting;
-	//Receive = LinkStateRoutingP.LinkStateRoutingReceive;
+	Receive = LinkStateRoutingP.LinkStateRoutingReceive;
 
 	LinkStateRoutingP.Sender -> SimpleSendC;
 	LinkStateRoutingP.Receive -> AMReceiverC;
