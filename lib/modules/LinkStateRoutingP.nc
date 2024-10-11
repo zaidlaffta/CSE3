@@ -38,8 +38,9 @@ implementation {
     }
 
     command void LinkStateRouting.start() {
+        pack* myMsg = (pack*) payload;
         dbg(GENERAL_CHANNEL, "Starting Routing\n");
-        call NeighborDiscovery.processDiscovery(payload);
+        call NeighborDiscovery.processDiscovery(myMsg);
         call PeriodicTimer.startPeriodic(10000);
     }
 
