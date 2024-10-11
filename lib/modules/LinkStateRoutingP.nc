@@ -5,6 +5,12 @@
 #include "../../includes/protocol.h"
 #include "../../includes/sendInfo.h"
 
+// Declare the structure for LinkStateRouting
+typedef struct {
+    uint16_t dest;
+    uint16_t cost;
+    uint16_t nextHop;
+} LinkStateRoutingS;
 
 module LinkStateRoutingP {
     provides interface LinkStateRouting;
@@ -16,8 +22,8 @@ module LinkStateRoutingP {
 }
 
 implementation {
-    // Just use an array to store routing entries
-    LinkStateRoutingS LinkStateRoutingS[255];
+    // Array to store routing entries
+    LinkStateRoutingS LinkStateRoutingTable[255];
     // Keeps track of number of items in the array
     uint16_t counter = 0;
 
@@ -40,17 +46,17 @@ implementation {
     }
 
     command uint16_t LinkStateRouting.getNextHop(uint16_t finalDest) {
-        for (uint32_t i = 0; i < counter; i++) {
-            if (LinkStateRoutingS[i].dest == finalDest && LinkStateRoutingS[i].cost < 999) {
-                return LinkStateRoutingS[i].nextHop;
+        for (uint16_t i = 0; i < counter; i++) {
+            if (LinkStateRoutingTable[i].dest == finalDest && LinkStateRoutingTable[i].cost < 999) {
+                return LinkStateRoutingTable[i].nextHop;
             }
         }
         return 999;
     }
 
     uint32_t findEntry(uint16_t dest) {
-        for (uint32_t i = 0; i < counter; i++) {
-            if (LinkStateRoutingS[i].dest == dest) {
+        for (uint16_t i = 0; i < counter; i++) {
+            if (LinkStateRoutingTable[i].dest == dest) {
                 return i;
             }
         }
@@ -59,9 +65,9 @@ implementation {
 
     void addToLinkStateRouting(uint16_t dest, uint16_t cost, uint16_t nextHop) {
         if (counter < 255 && dest != TOS_NODE_ID) {
-            LinkStateRoutingS[counter].dest = dest;
-            LinkStateRoutingS[counter].cost = cost;    
-            LinkStateRoutingS[counter].nextHop = nextHop;    
+            LinkStateRoutingTable[counter].dest = dest;
+            LinkStateRoutingTable[counter].cost = cost;    
+            LinkStateRoutingTable[counter].nextHop = nextHop;    
             counter++;
         }
     }
@@ -81,29 +87,29 @@ implementation {
         }
 
         // Clear old neighbors
-        for (uint32_t i = 0; i < counter; i++) {
-            if (LinkStateRoutingS[i].cost == 1) {
-                LinkStateRoutingS[i].cost = 999;
+        for (uint16_t i = 0; i < counter; i++) {
+            if (LinkStateRoutingTable[i].cost == 1) {
+                LinkStateRoutingTable[i].cost = 999;
             }
         }
 
         // Update routing table with neighbors from the refreshed list
-        for (uint32_t i = 0; i < counter; i++) {
+        for (uint16_t i = 0; i < counter; i++) {
             for (uint16_t j = 0; j < tempTableSize; j++) {
-                if (TempNeighbors[j].node == LinkStateRoutingS[i].dest) {
-                    LinkStateRoutingS[i].nextHop = LinkStateRoutingS[i].dest;
-                    LinkStateRoutingS[i].cost = 1;        
+                if (TempNeighbors[j].node == LinkStateRoutingTable[i].dest) {
+                    LinkStateRoutingTable[i].nextHop = LinkStateRoutingTable[i].dest;
+                    LinkStateRoutingTable[i].cost = 1;        
                 }
             }
         }
     }
 
     void sendLinkStateRouting() {
-        for (uint32_t i = 0; i < counter; i++) {
-            if (LinkStateRoutingS[i].dest == LinkStateRoutingS[i].nextHop && LinkStateRoutingS[i].nextHop != 999) {
-                LinkStateRoutingS tempLinkStateRouting[1] = {LinkStateRoutingS[i]};
+        for (uint16_t i = 0; i < counter; i++) {
+            if (LinkStateRoutingTable[i].dest == LinkStateRoutingTable[i].nextHop && LinkStateRoutingTable[i].nextHop != 999) {
+                LinkStateRoutingS tempLinkStateRouting[1] = {LinkStateRoutingTable[i]};
 
-                makePack(&myMsg, TOS_NODE_ID, AM_BROADCAST_ADDR, 0, 0, PROTOCOL_PING, (uint8_t*)tempLinkStateRouting, sizeof(LinkStateRoutingS[0]));
+                makePack(&myMsg, TOS_NODE_ID, AM_BROADCAST_ADDR, 0, 0, PROTOCOL_PING, (uint8_t*)tempLinkStateRouting, sizeof(LinkStateRoutingTable[0]));
                 call Sender.send(myMsg, myMsg.dest);
             }    
         }
@@ -118,7 +124,7 @@ implementation {
         LinkStateRoutingS tempLinkStateRouting[1];
         pack *msg = (pack *) payload;
 
-        memcpy(tempLinkStateRouting, msg->payload, sizeof(LinkStateRoutingS[0]));
+        memcpy(tempLinkStateRouting, msg->payload, sizeof(LinkStateRoutingTable[0]));
         uint32_t j = findEntry(tempLinkStateRouting[0].dest);
 
         // If I am neighbor, remove just in case
@@ -127,15 +133,15 @@ implementation {
         }
 
         if (j != 999) {
-            if (LinkStateRoutingS[j].nextHop == msg->src) {
+            if (LinkStateRoutingTable[j].nextHop == msg->src) {
                 // Update the cost 
                 if (tempLinkStateRouting[0].cost < 999) {
-                    LinkStateRoutingS[j].cost = tempLinkStateRouting[0].cost + 1;
+                    LinkStateRoutingTable[j].cost = tempLinkStateRouting[0].cost + 1;
                 }
-            } else if ((tempLinkStateRouting[0].cost + 1) < LinkStateRoutingS[j].cost) {
+            } else if ((tempLinkStateRouting[0].cost + 1) < LinkStateRoutingTable[j].cost) {
                 // If my cost is lower update
-                LinkStateRoutingS[j].cost = tempLinkStateRouting[0].cost + 1;
-                LinkStateRoutingS[j].nextHop = msg->src;
+                LinkStateRoutingTable[j].cost = tempLinkStateRouting[0].cost + 1;
+                LinkStateRoutingTable[j].nextHop = msg->src;
             }
         } else {
             addToLinkStateRouting(tempLinkStateRouting[0].dest, tempLinkStateRouting[0].cost, msg->src);
@@ -148,9 +154,9 @@ implementation {
         dbg(GENERAL_CHANNEL, "Printing Routing Table\n");
         dbg(GENERAL_CHANNEL, "Dest\tHop\tCount\n");
                 
-        for (uint32_t i = 0; i < counter; i++) {
-            if (LinkStateRoutingS[i].dest != 0) {
-                dbg(GENERAL_CHANNEL, "%u\t\t%u\t%u\n", LinkStateRoutingS[i].dest, LinkStateRoutingS[i].nextHop, LinkStateRoutingS[i].cost);
+        for (uint16_t i = 0; i < counter; i++) {
+            if (LinkStateRoutingTable[i].dest != 0) {
+                dbg(GENERAL_CHANNEL, "%u\t\t%u\t%u\n", LinkStateRoutingTable[i].dest, LinkStateRoutingTable[i].nextHop, LinkStateRoutingTable[i].cost);
             }
         }
     }
