@@ -124,7 +124,7 @@ implementation {
    event void CommandHandler.printRouteTable() {}
 
    event void CommandHandler.printLinkState() {
-      call LinkStateRouting.printRouteTable();
+     // call LinkStateRouting.printRouteTable();
    }
 
    event void CommandHandler.printDistanceVector() {}
