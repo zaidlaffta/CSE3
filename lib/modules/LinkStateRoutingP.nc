@@ -38,11 +38,27 @@ implementation {
     }
 
     command void LinkStateRouting.start() {
-        pack* myMsg = (pack*) payload;
-        dbg(GENERAL_CHANNEL, "Starting Routing\n");
-        call NeighborDiscovery.processDiscovery(myMsg);
-        call PeriodicTimer.startPeriodic(10000);
+    if (payload == NULL) {
+        dbg(GENERAL_CHANNEL, "Error: Payload is NULL\n");
+        return;
     }
+
+    pack* myMsg = (pack*) payload;
+    
+    // Check if the message is valid
+    if (myMsg == NULL) {
+        dbg(GENERAL_CHANNEL, "Error: myMsg is NULL after casting\n");
+        return;
+    }
+
+    dbg(GENERAL_CHANNEL, "Starting Routing\n");
+    
+    // Call the neighbor discovery process
+    call NeighborDiscovery.processDiscovery(myMsg);
+    
+    // Start the periodic timer
+    call PeriodicTimer.startPeriodic(10000);
+}
 
     command uint16_t LinkStateRouting.getNextHop(uint16_t finalDest) {
         uint16_t i;
