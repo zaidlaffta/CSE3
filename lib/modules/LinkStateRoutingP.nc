@@ -8,13 +8,14 @@
 
 
 module LinkStateRoutingP{
+    provides interface LinkStateRouting;
 
 	uses interface Timer<TMilli> as PeriodicTimer;
 	uses interface SimpleSend as Sender;
 	uses interface Receive as Receive;
 	uses interface NeighborDiscovery;
 	
-	provides interface LinkStateRouting;	
+		
 }
 
 implementation {
