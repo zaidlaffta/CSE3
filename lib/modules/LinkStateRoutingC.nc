@@ -21,6 +21,6 @@ implementation {
     
     LinkStateRouting = LinkStateRoutingP;
     NeighborDiscovery = NeighborDiscoveryC;
-    SimpleSend = SimpleSendC;
-    LSRTimer = TimerMilliC;
+    SimpleSend = SimpleSendC as SimpleSendCInstance;
+    LSRTimer = TimerMilliC as LSRTimerInstance;
 }
