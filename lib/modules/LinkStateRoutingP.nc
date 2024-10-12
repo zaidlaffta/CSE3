@@ -69,35 +69,25 @@ implementation {
         }
     }
 
-    // Update routing table from neighbors
-    void getNeighbors() {
-        uint16_t j;
-        uint16_t tempTableSize = call NeighborDiscovery.fetchNeighborCount();
-        struct neighborTableS TempNeighbors[255];
-        void* tempNeighb = call NeighborDiscovery.fetchNeighbors();
-        memcpy(TempNeighbors, tempNeighb, sizeof(struct neighborTableS) * tempTableSize);
-        
-        for (j = 0; j < tempTableSize; j++) {
-            if (findEntry(TempNeighbors[j].node) == 999) {
-                addToLinkStateRouting(TempNeighbors[j].node, 1, TempNeighbors[j].node);
-            }
-        }
-        uint16_t i;
-        for ( i = 0; i < counter; i++) {
-            if (LinkStateRoutingTable[i].cost == 1) {
-                LinkStateRoutingTable[i].cost = 999;
-            }
-        }
-        uint16_t i;
-        for (i = 0; i < counter; i++) {
-            for (uint16_t j = 0; j < tempTableSize; j++) {
-                if (TempNeighbors[j].node == LinkStateRoutingTable[i].dest) {
-                    LinkStateRoutingTable[i].nextHop = LinkStateRoutingTable[i].dest;
-                    LinkStateRoutingTable[i].cost = 1;
-                }
+   void getNeighbors() {
+    uint16_t neighborCount = call NeighborDiscovery.fetchNeighborCount();
+    uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
+    
+    for (uint16_t j = 0; j < neighborCount; j++) {
+        uint16_t neighborID = neighbors[j];
+        uint16_t ttl = call NeighborDiscovery.getNeighborTTL(neighborID);
+
+        if (ttl > 0 && findEntry(neighborID) == 999) {
+            addToLinkStateRouting(neighborID, 1, neighborID); // Add neighbor with direct link (cost = 1)
+        } else if (ttl == 0) {
+            // Neighbor expired; handle accordingly, such as marking the cost as high
+            uint32_t index = findEntry(neighborID);
+            if (index != 999) {
+                LinkStateRoutingTable[index].cost = 999; // Mark as unreachable
             }
         }
     }
+}
 
     // Periodic updates
     event void PeriodicTimer.fired() {
