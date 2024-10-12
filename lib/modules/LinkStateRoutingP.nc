@@ -75,14 +75,14 @@ implementation {
         struct neighborTableS TempNeighbors[255];
         void* tempNeighb = call NeighborDiscovery.getNeighborList();
         memcpy(TempNeighbors, tempNeighb, sizeof(struct neighborTableS) * tempTableSize);
-
-        for (uint16_t j = 0; j < tempTableSize; j++) {
+            uint16_t j;
+        for ( j = 0; j < tempTableSize; j++) {
             if (findEntry(TempNeighbors[j].node) == 999) {
                 addToLinkStateRouting(TempNeighbors[j].node, 1, TempNeighbors[j].node);
             }
         }
-
-        for (uint16_t i = 0; i < counter; i++) {
+        uint16_t i;
+        for ( i = 0; i < counter; i++) {
             if (LinkStateRoutingTable[i].cost == 1) {
                 LinkStateRoutingTable[i].cost = 999;
             }
