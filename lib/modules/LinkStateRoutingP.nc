@@ -50,7 +50,8 @@ implementation {
 
     // Helper to find an entry in the routing table
     uint32_t findEntry(uint16_t dest) {
-        for (uint16_t i = 0; i < counter; i++) {
+        uint16_t i;
+        for ( i = 0; i < counter; i++) {
             if (LinkStateRoutingTable[i].dest == dest) {
                 return i;
             }
