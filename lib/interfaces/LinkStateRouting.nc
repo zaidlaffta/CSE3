@@ -3,6 +3,11 @@
 // LinkStateRouting.nc
 // Sep/28/2024
 // Zaid Laffta
+#include <Timer.h>
+#include "../../includes/CommandMsg.h"
+#include "../../includes/packet.h"
+#include "../../includes/command.h"
+#include "../../includes/channels.h"
 
 interface LinkStateRouting {
     // Initializes the Link State Routing Protocol
