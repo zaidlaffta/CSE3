@@ -36,7 +36,7 @@ implementation{
       if(err == SUCCESS){
          // dbg(GENERAL_CHANNEL, "Radio On\n");
 
-         call Forwarding.start();
+        
       }else{
          //Retry until successful
          call AMControl.start();
@@ -46,10 +46,7 @@ implementation{
    event void AMControl.stopDone(error_t err){}
 
    command message_t* Node.receive(message_t* msg, void* payload, uint8_t len){
-      /*       
-       * destination must equal TOS_NODE_ID or else the forwarding layer
-       * wouldn't have given us this packet
-       */
+      
 
       // dbg(GENERAL_CHANNEL, "Packet Received\n");
       if(len==sizeof(pack)){
@@ -93,7 +90,7 @@ implementation{
    event void CommandHandler.printRouteTable()
    {
       dbg(GENERAL_CHANNEL, "CommandHandler.printRouteTable() \n");
-      call RoutingTable.print();
+      call LinkStateRouting.print();
    }
 
    event void CommandHandler.printLinkState(){}
@@ -131,6 +128,6 @@ implementation{
       }
 
       // dbg(GENERAL_CHANNEL, "Sending{dest=%u,src=%u,seq=%u,TTL=%u,protocol=%u}\n", dest, src, seq, TTL, protocol);
-      call Forwarding.send(&packet);
+      
    }
 }
