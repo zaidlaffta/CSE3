@@ -81,9 +81,9 @@ implementation{
       ++ping_seq_num;
    }
 
-   event void CommandHandler.printNeighbors()
+   event void CommandHandler.displayNeighbors()
    {
-      // dbg(GENERAL_CHANNEL, "CommandHandler.printNeighbors() \n");
+      // dbg(GENERAL_CHANNEL, "CommandHandler.displayNeighbors() \n");
       call NeighborDiscovery.print();
    }
 
