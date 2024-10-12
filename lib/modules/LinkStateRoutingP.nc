@@ -14,7 +14,7 @@ typedef struct {
 
 module LinkStateRoutingP {
     provides interface LinkStateRouting;
-    
+
     uses interface Timer<TMilli> as PeriodicTimer;
     uses interface SimpleSend as Sender;
     uses interface Receive;
@@ -32,7 +32,7 @@ implementation {
 
         // Initialize Neighbor Discovery
         call NeighborDiscovery.initialize();
-        
+
         // Start the periodic timer for neighbor updates
         call PeriodicTimer.startPeriodic(10000);
     }
@@ -51,7 +51,7 @@ implementation {
     // Helper to find an entry in the routing table
     uint32_t findEntry(uint16_t dest) {
         uint16_t i;
-        for ( i = 0; i < counter; i++) {
+        for (i = 0; i < counter; i++) {
             if (LinkStateRoutingTable[i].dest == dest) {
                 return i;
             }
@@ -69,25 +69,25 @@ implementation {
         }
     }
 
-   void getNeighbors() {
-    uint16_t neighborCount = call NeighborDiscovery.fetchNeighborCount();
-    uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
-    
-    for (uint16_t j = 0; j < neighborCount; j++) {
-        uint16_t neighborID = neighbors[j];
-        uint16_t ttl = call NeighborDiscovery.getNeighborTTL(neighborID);
+    // Retrieve and process neighbors
+    void getNeighbors() {
+        uint16_t neighborCount = call NeighborDiscovery.fetchNeighborCount();
+        uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
 
-        if (ttl > 0 && findEntry(neighborID) == 999) {
-            addToLinkStateRouting(neighborID, 1, neighborID); // Add neighbor with direct link (cost = 1)
-        } else if (ttl == 0) {
-            // Neighbor expired; handle accordingly, such as marking the cost as high
-            uint32_t index = findEntry(neighborID);
-            if (index != 999) {
-                LinkStateRoutingTable[index].cost = 999; // Mark as unreachable
+        for (uint16_t j = 0; j < neighborCount; j++) {
+            uint16_t neighborID = neighbors[j];
+            uint16_t ttl = call NeighborDiscovery.getNeighborTTL(neighborID);
+
+            if (ttl > 0 && findEntry(neighborID) == 999) {
+                addToLinkStateRouting(neighborID, 1, neighborID);
+            } else if (ttl == 0) {
+                uint32_t index = findEntry(neighborID);
+                if (index != 999) {
+                    LinkStateRoutingTable[index].cost = 999; // Mark as unreachable
+                }
             }
         }
     }
-}
 
     // Periodic updates
     event void PeriodicTimer.fired() {
@@ -105,26 +105,25 @@ implementation {
             }
         }
     }
-void handleLS(pack* myMsg) {
-    LinkStateRoutingS receivedEntry;
-    memcpy(&receivedEntry, myMsg->payload, sizeof(LinkStateRoutingS));
 
-    uint32_t entryIndex = findEntry(receivedEntry.dest);
-    
-    if (entryIndex != 999) { // Entry already exists
-        // Update cost if the new route is shorter
-        if (receivedEntry.cost + 1 < LinkStateRoutingTable[entryIndex].cost) {
-            LinkStateRoutingTable[entryIndex].cost = receivedEntry.cost + 1;
-            LinkStateRoutingTable[entryIndex].nextHop = myMsg->src;
-            dbg(GENERAL_CHANNEL, "Updated route to %d via %d with cost %d\n", 
-                receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
+    // Handle incoming LinkState packets
+    command void LinkStateRouting.handleLS(pack* myMsg) {
+        LinkStateRoutingS receivedEntry;
+        memcpy(&receivedEntry, myMsg->payload, sizeof(LinkStateRoutingS));
+
+        uint32_t entryIndex = findEntry(receivedEntry.dest);
+
+        if (entryIndex != 999) {
+            if (receivedEntry.cost + 1 < LinkStateRoutingTable[entryIndex].cost) {
+                LinkStateRoutingTable[entryIndex].cost = receivedEntry.cost + 1;
+                LinkStateRoutingTable[entryIndex].nextHop = myMsg->src;
+                dbg(GENERAL_CHANNEL, "Updated route to %d via %d with cost %d\n", receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
+            }
+        } else {
+            addToLinkStateRouting(receivedEntry.dest, receivedEntry.cost + 1, myMsg->src);
+            dbg(GENERAL_CHANNEL, "Added new route to %d via %d with cost %d\n", receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
         }
-    } else { // New entry
-        addToLinkStateRouting(receivedEntry.dest, receivedEntry.cost + 1, myMsg->src);
-        dbg(GENERAL_CHANNEL, "Added new route to %d via %d with cost %d\n", 
-            receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
     }
-}
 
     // Handle incoming messages
     event message_t* Receive.receive(message_t* raw_msg, void* payload, uint8_t len) {
