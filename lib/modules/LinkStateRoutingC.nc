@@ -1,32 +1,15 @@
-#include <Timer.h>
+// Project 1
+// CSE 160
+// LinkStateRoutingC.nc
+// Sep/28/2024
+// Zaid Laffta
 
-#include "../../includes/CommandMsg.h"
-#include "../../includes/packet.h"
-#include "../../includes/channels.h"
-#include "../../includes/protocol.h"
-#include "../../includes/sendInfo.h"
-
-#define AM_ROUTING 63
-
-configuration LinkStateRoutingC{
-	provides interface LinkStateRouting;
-	//provides interface Receive;
+configuration LinkStateRoutingC {
+    provides interface LinkStateRouting;
 }
 
-implementation{
-	components LinkStateRoutingP;
-	components new TimerMilliC() as PeriodicTimer;
-	components new SimpleSendC(AM_ROUTING);
-	components new AMReceiverC(AM_ROUTING);
-
-	components NeighborDiscoveryC;
-	LinkStateRoutingP.NeighborDiscovery -> NeighborDiscoveryC;
-	
-	LinkStateRouting = LinkStateRoutingP.LinkStateRouting;
-	Receive = LinkStateRoutingP.LinkStateRoutingReceive;
-
-	LinkStateRoutingP.Sender -> SimpleSendC;
-	LinkStateRoutingP.Receive -> AMReceiverC;
-	LinkStateRoutingP.PeriodicTimer -> PeriodicTimer;
-
+implementation {
+    // Wiring the LinkStateRouting interface to the module
+    components LinkStateRoutingP as LSRP;
+    LinkStateRouting = LSRP;
 }

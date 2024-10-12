@@ -1,170 +1,110 @@
-#include <Timer.h>
-#include "../../includes/CommandMsg.h"
-#include "../../includes/packet.h"
-#include "../../includes/channels.h"
-#include "../../includes/protocol.h"
-#include "../../includes/sendInfo.h"
+// Project 1
+// CSE 160
+// LinkStateRoutingP.nc
+// Sep/28/2024
+// Zaid Laffta
 
-// Declare the structure for LinkStateRouting
-typedef struct {
-    uint16_t dest;
-    uint16_t cost;
-    uint16_t nextHop;
-} LinkStateRoutingS;
+#include <Timer.h>
+#include "../../includes/channels.h"
+#include "../../includes/packet.h"
+#include "../../includes/protocol.h"
+
+#define MAX_NODES 20 // Adjust based on the network size
+#define LINK_STATE_TTL 30
 
 module LinkStateRoutingP {
     provides interface LinkStateRouting;
-
-    uses interface Timer<TMilli> as PeriodicTimer;
-    uses interface SimpleSend as Sender;
-    uses interface Receive;
     uses interface NeighborDiscovery;
+    uses interface Timer<TMilli> as LSTimer;
+    uses interface SimpleSend as Broadcaster;
 }
 
 implementation {
-    LinkStateRoutingS LinkStateRoutingTable[255];
-    uint16_t counter = 0;
-    pack myMsg;
+    typedef struct {
+        uint16_t nodeID;
+        uint16_t cost;
+    } LinkStateEntry;
 
-    // Initialize and start Link State Routing
-    command void LinkStateRouting.start() {
-        dbg(GENERAL_CHANNEL, "Starting Link State Routing\n");
+    typedef struct {
+        uint16_t nodeID;
+        LinkStateEntry neighbors[MAX_NODES];
+        uint8_t neighborCount;
+    } RoutingTableEntry;
 
-        // Initialize Neighbor Discovery
-        call NeighborDiscovery.initialize();
+    // Routing Table and Timer
+    RoutingTableEntry routingTable[MAX_NODES];
+    uint8_t tableSize = 0;
+    pack LSPacket;
 
-        // Start the periodic timer for neighbor updates
-        call PeriodicTimer.startPeriodic(10000);
+    // Helper function to create Link State Update packets
+    void makeLS(pack *pkt, uint16_t src, uint16_t ttl, uint8_t* payload, uint8_t len);
+
+    // Initialize Link State Routing
+    command error_t LinkStateRouting.initialize() {
+        call LSTimer.startPeriodic(1000); // Every second
+        dbg(GENERAL_CHANNEL, "Link State Routing Initialized\n");
+        return SUCCESS;
     }
 
-    // Get the next hop for a given destination
-    command uint16_t LinkStateRouting.getNextHop(uint16_t finalDest) {
-        uint16_t i;
-        for (i = 0; i < counter; i++) {
-            if (LinkStateRoutingTable[i].dest == finalDest && LinkStateRoutingTable[i].cost < 999) {
-                return LinkStateRoutingTable[i].nextHop;
+    // Process Link State Update packets
+    command void LinkStateRouting.handleLS(pack* message) {
+        uint16_t src = message->src;
+        dbg(GENERAL_CHANNEL, "Handling Link State Update from Node %d\n", src);
+
+        bool exists = FALSE;
+        for (uint8_t i = 0; i < tableSize; i++) {
+            if (routingTable[i].nodeID == src) {
+                exists = TRUE;
+                break;
             }
         }
-        return -1;
-    }
 
-    // Helper to find an entry in the routing table
-    uint32_t findEntry(uint16_t dest) {
-        uint16_t i;
-        for (i = 0; i < counter; i++) {
-            if (LinkStateRoutingTable[i].dest == dest) {
-                return i;
-            }
+        if (!exists && tableSize < MAX_NODES) {
+            routingTable[tableSize].nodeID = src;
+            routingTable[tableSize].neighborCount = 0; // Add logic to update neighbors
+            tableSize++;
         }
-        return 999;
+
+        // Handle the LSU based on the received payload
+        // Example: add logic to update routingTable with received neighbor data
+        // Use the payload to extract neighbors and update the routing table accordingly
     }
 
-    // Add an entry to the routing table
-    void addToLinkStateRouting(uint16_t dest, uint16_t cost, uint16_t nextHop) {
-        if (counter < 255 && dest != TOS_NODE_ID) {
-            LinkStateRoutingTable[counter].dest = dest;
-            LinkStateRoutingTable[counter].cost = cost;
-            LinkStateRoutingTable[counter].nextHop = nextHop;
-            counter++;
-        }
-    }
-
-    // Retrieve and process neighbors
-    void getNeighbors() {
-        uint16_t j;
-        uint16_t neighborCount = call NeighborDiscovery.fetchNeighborCount();
-        uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
-
-        for (j = 0; j < neighborCount; j++) {
-            uint16_t neighborID = neighbors[j];
-            uint16_t ttl = call NeighborDiscovery.getNeighborTTL(neighborID);
-
-            if (ttl > 0 && findEntry(neighborID) == 999) {
-                addToLinkStateRouting(neighborID, 1, neighborID);
-            } else if (ttl == 0) {
-                uint32_t index = findEntry(neighborID);
-                if (index != 999) {
-                    LinkStateRoutingTable[index].cost = 999; // Mark as unreachable
-                }
+    // Display the routing table
+    command void LinkStateRouting.displayRoutingTable() {
+        dbg(GENERAL_CHANNEL, "Displaying Routing Table:\n");
+        for (uint8_t i = 0; i < tableSize; i++) {
+            dbg(GENERAL_CHANNEL, "Node %d:\n", routingTable[i].nodeID);
+            for (uint8_t j = 0; j < routingTable[i].neighborCount; j++) {
+                dbg(GENERAL_CHANNEL, "  Neighbor %d, Cost %d\n",
+                    routingTable[i].neighbors[j].nodeID,
+                    routingTable[i].neighbors[j].cost);
             }
         }
     }
 
-    // Periodic updates
-    event void PeriodicTimer.fired() {
-        getNeighbors();
-        sendLinkStateRouting();
+    // Periodically broadcast Link State Updates
+    event void LSTimer.fired() {
+        uint8_t payload[MAX_NODES * sizeof(LinkStateEntry)];
+        uint8_t len = 0;
+
+        // Collect neighbor information and fill payload
+        for (uint8_t i = 0; i < call NeighborDiscovery.fetchNeighborCount(); i++) {
+            // Example: assuming each entry has nodeID and cost
+            // Adjust payload construction as per your LinkStateEntry structure
+        }
+
+        makeLS(&LSPacket, TOS_NODE_ID, LINK_STATE_TTL, payload, len);
+        call Broadcaster.send(LSPacket, AM_BROADCAST_ADDR);
+        dbg(GENERAL_CHANNEL, "Link State Update broadcasted\n");
     }
 
-    // Send the routing information
-    void sendLinkStateRouting() {
-        uint16_t i;
-        for (i = 0; i < counter; i++) {
-            if (LinkStateRoutingTable[i].dest == LinkStateRoutingTable[i].nextHop && LinkStateRoutingTable[i].nextHop != 999) {
-                LinkStateRoutingS tempLinkStateRouting[1] = {LinkStateRoutingTable[i]};
-                makePack(&myMsg, TOS_NODE_ID, AM_BROADCAST_ADDR, 0, PROTOCOL_PING, 0, (uint8_t*)tempLinkStateRouting, sizeof(LinkStateRoutingTable[0]));
-                call Sender.send(&myMsg, AM_BROADCAST_ADDR);
-            }
-        }
-    }
-
-    // Handle incoming LinkState packets
-    command void LinkStateRouting.handleLS(pack* myMsg) {
-        LinkStateRoutingS receivedEntry;
-        memcpy(&receivedEntry, myMsg->payload, sizeof(LinkStateRoutingS));
-
-        uint32_t entryIndex = findEntry(receivedEntry.dest);
-
-        if (entryIndex != 999) {
-            if (receivedEntry.cost + 1 < LinkStateRoutingTable[entryIndex].cost) {
-                LinkStateRoutingTable[entryIndex].cost = receivedEntry.cost + 1;
-                LinkStateRoutingTable[entryIndex].nextHop = myMsg->src;
-                dbg(GENERAL_CHANNEL, "Updated route to %d via %d with cost %d\n", receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
-            }
-        } else {
-            addToLinkStateRouting(receivedEntry.dest, receivedEntry.cost + 1, myMsg->src);
-            dbg(GENERAL_CHANNEL, "Added new route to %d via %d with cost %d\n", receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
-        }
-    }
-
-    // Handle incoming messages
-    event message_t* Receive.receive(message_t* raw_msg, void* payload, uint8_t len) {
-        pack *msg = (pack *) payload;
-        LinkStateRoutingS tempLinkStateRouting[1];
-
-        if (len == sizeof(pack) && msg->protocol == PROTOCOL_LS) {
-            memcpy(tempLinkStateRouting, msg->payload, sizeof(LinkStateRoutingTable[0]));
-            uint32_t j = findEntry(tempLinkStateRouting[0].dest);
-
-            if (tempLinkStateRouting[0].nextHop == TOS_NODE_ID) {
-                tempLinkStateRouting[0].cost = 999;
-            }
-
-            if (j != 999) {
-                if (LinkStateRoutingTable[j].nextHop == msg->src) {
-                    if (tempLinkStateRouting[0].cost < 999) {
-                        LinkStateRoutingTable[j].cost = tempLinkStateRouting[0].cost + 1;
-                    }
-                } else if ((tempLinkStateRouting[0].cost + 1) < LinkStateRoutingTable[j].cost) {
-                    LinkStateRoutingTable[j].cost = tempLinkStateRouting[0].cost + 1;
-                    LinkStateRoutingTable[j].nextHop = msg->src;
-                }
-            } else {
-                addToLinkStateRouting(tempLinkStateRouting[0].dest, tempLinkStateRouting[0].cost, msg->src);
-            }
-        }
-        return raw_msg;
-    }
-
-    // Print routing table
-    command void LinkStateRouting.print() {
-        dbg(GENERAL_CHANNEL, "Printing Routing Table\n");
-        dbg(GENERAL_CHANNEL, "Dest\tHop\tCost\n");
-
-        for (uint16_t i = 0; i < counter; i++) {
-            if (LinkStateRoutingTable[i].dest != 0) {
-                dbg(GENERAL_CHANNEL, "%u\t%u\t%u\n", LinkStateRoutingTable[i].dest, LinkStateRoutingTable[i].nextHop, LinkStateRoutingTable[i].cost);
-            }
-        }
+    // Helper function to prepare Link State packets
+    void makeLS(pack *pkt, uint16_t src, uint16_t ttl, uint8_t* payload, uint8_t len) {
+        pkt->src = src;
+        pkt->dest = 0;
+        pkt->TTL = ttl;
+        pkt->protocol = PROTOCOL_LS;
+        memcpy(pkt->payload, payload, len);
     }
 }

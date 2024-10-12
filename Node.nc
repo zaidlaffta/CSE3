@@ -36,7 +36,7 @@ implementation {
       dbg(GENERAL_CHANNEL, "Booted\n");
 
       //debug the linkstate routing protocol
-      call LinkStateRouting.start(); 
+
 
 
    }
@@ -124,7 +124,7 @@ implementation {
    event void CommandHandler.printRouteTable() {}
 
    event void CommandHandler.printLinkState() {
-     // call LinkStateRouting.printRouteTable();
+  
    }
 
    event void CommandHandler.printDistanceVector() {}
