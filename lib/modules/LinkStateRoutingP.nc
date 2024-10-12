@@ -71,10 +71,11 @@ implementation {
 
     // Retrieve and process neighbors
     void getNeighbors() {
+        uint16_t j;
         uint16_t neighborCount = call NeighborDiscovery.fetchNeighborCount();
         uint32_t* neighbors = call NeighborDiscovery.fetchNeighbors();
 
-        for (uint16_t j = 0; j < neighborCount; j++) {
+        for (j = 0; j < neighborCount; j++) {
             uint16_t neighborID = neighbors[j];
             uint16_t ttl = call NeighborDiscovery.getNeighborTTL(neighborID);
 
