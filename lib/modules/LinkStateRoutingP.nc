@@ -71,11 +71,12 @@ implementation {
 
     // Update routing table from neighbors
     void getNeighbors() {
+        uint16_t j;
         uint16_t tempTableSize = call NeighborDiscovery.fetchNeighborCount();
         struct neighborTableS TempNeighbors[255];
         void* tempNeighb = call NeighborDiscovery.fetchNeighbors();
         memcpy(TempNeighbors, tempNeighb, sizeof(struct neighborTableS) * tempTableSize);
-        uint16_t j =0;
+        
         for (j = 0; j < tempTableSize; j++) {
             if (findEntry(TempNeighbors[j].node) == 999) {
                 addToLinkStateRouting(TempNeighbors[j].node, 1, TempNeighbors[j].node);
