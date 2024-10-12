@@ -105,6 +105,26 @@ implementation {
             }
         }
     }
+void handleLS(pack* myMsg) {
+    LinkStateRoutingS receivedEntry;
+    memcpy(&receivedEntry, myMsg->payload, sizeof(LinkStateRoutingS));
+
+    uint32_t entryIndex = findEntry(receivedEntry.dest);
+    
+    if (entryIndex != 999) { // Entry already exists
+        // Update cost if the new route is shorter
+        if (receivedEntry.cost + 1 < LinkStateRoutingTable[entryIndex].cost) {
+            LinkStateRoutingTable[entryIndex].cost = receivedEntry.cost + 1;
+            LinkStateRoutingTable[entryIndex].nextHop = myMsg->src;
+            dbg(GENERAL_CHANNEL, "Updated route to %d via %d with cost %d\n", 
+                receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
+        }
+    } else { // New entry
+        addToLinkStateRouting(receivedEntry.dest, receivedEntry.cost + 1, myMsg->src);
+        dbg(GENERAL_CHANNEL, "Added new route to %d via %d with cost %d\n", 
+            receivedEntry.dest, myMsg->src, receivedEntry.cost + 1);
+    }
+}
 
     // Handle incoming messages
     event message_t* Receive.receive(message_t* raw_msg, void* payload, uint8_t len) {
