@@ -45,7 +45,7 @@ implementation {
     command error_t LinkStateRouting.initialize() {
         call LSTimer.startPeriodic(1000); // Every second
         dbg(GENERAL_CHANNEL, "Link State Routing Initialized\n");
-        return SUCCESS;
+        return SUCCESS;//
     }
 
     command void LinkStateRouting.handleLS(pack* message) {
