@@ -35,8 +35,7 @@ implementation {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
 
-      //debug the linkstate routing protocol
-
+      //debug the linkstate routing protoc
 
 
    }
