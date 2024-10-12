@@ -98,7 +98,8 @@ implementation {
 
     // Send the routing information
     void sendLinkStateRouting() {
-        for (uint16_t i = 0; i < counter; i++) {
+        uint16_t i;
+        for (i = 0; i < counter; i++) {
             if (LinkStateRoutingTable[i].dest == LinkStateRoutingTable[i].nextHop && LinkStateRoutingTable[i].nextHop != 999) {
                 LinkStateRoutingS tempLinkStateRouting[1] = {LinkStateRoutingTable[i]};
                 makePack(&myMsg, TOS_NODE_ID, AM_BROADCAST_ADDR, 0, PROTOCOL_PING, 0, (uint8_t*)tempLinkStateRouting, sizeof(LinkStateRoutingTable[0]));
