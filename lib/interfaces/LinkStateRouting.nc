@@ -9,13 +9,9 @@
 #include "../../includes/command.h"
 #include "../../includes/channels.h"
 
-interface LinkStateRouting {
-    // Initializes the Link State Routing Protocol
-    command error_t initialize();
-
-    // Processes a Link State Update (LSU) packet
-    command void handleLS(pack* message);
-
-    // Fetches the routing table for debugging
-    command void displayRoutingTable();
+interface LinkStateRouting{
+	command void start();
+	command void print();
+	command uint16_t getNextHop(uint16_t dest);
+	command message_t* receive(message_t* myMsg, void* payload, uint8_t len);
 }
