@@ -8,12 +8,19 @@
 #include "../../includes/packet.h"
 #include "../../includes/command.h"
 #include "../../includes/channels.h"
+
+
 configuration LinkStateRoutingC {
     provides interface LinkStateRouting;
+    uses interface NeighborDiscovery;
+    uses interface SimpleSend;
+    uses interface Timer<TMilli> as LSRTimer;
 }
-
 implementation {
-    // Wiring the LinkStateRouting interface to the module
-    components LinkStateRoutingP as LSRP;
-    LinkStateRouting = LSRP;
+    components LinkStateRoutingP, NeighborDiscoveryC, SimpleSendC, TimerMilliC;
+    
+    LinkStateRouting = LinkStateRoutingP;
+    NeighborDiscovery = NeighborDiscoveryC;
+    SimpleSend = SimpleSendC;
+    LSRTimer = TimerMilliC;
 }
