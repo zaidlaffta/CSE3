@@ -13,7 +13,8 @@ module LinkStateRoutingP {
     uses interface NeighborDiscovery;
     uses interface SimpleSend;
     uses interface Timer<TMilli> as LSRTimer;
-
+}
+implementation{
     uint8_t neighborCount = 0;
     uint16_t routingTable[10]; // Example max neighbors, adjust as needed
 
